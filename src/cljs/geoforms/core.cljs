@@ -3,7 +3,8 @@
               [reagent.session :as session]
               [secretary.core :as secretary :include-macros true]
               [goog.events :as events]
-              [goog.history.EventType :as EventType])
+              [goog.history.EventType :as EventType]
+              geoforms.forms)
     (:import goog.History))
 
 ;; -------------------------
@@ -11,11 +12,17 @@
 
 (defn home-page []
   [:div [:h2 "Welcome to geoforms"]
-   [:div [:a {:href "#/about"} "go to about page"]]])
+   [:div [:a {:href "#/about"} "go to about page"]]
+   [:div [:a {:href "#/reagent-forms-example"} "go to reagent-forms example"]]])
 
 (defn about-page []
   [:div [:h2 "About geoforms"]
    [:div [:a {:href "#/"} "go to the home page"]]])
+
+(defn reagent-forms-example []
+  [:div [:h2 "From Reagent-forms"]
+   [:div [:a {:href "#/"} "go to the home page"]]
+   [geoforms.forms/page]])
 
 (defn current-page []
   [:div [(session/get :current-page)]])
@@ -29,6 +36,9 @@
 
 (secretary/defroute "/about" []
   (session/put! :current-page #'about-page))
+
+(secretary/defroute "/reagent-forms-example" []
+  (session/put! :current-page #'reagent-forms-example))
 
 ;; -------------------------
 ;; History

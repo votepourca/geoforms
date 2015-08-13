@@ -3,6 +3,7 @@
             [reagent.core :as reagent :refer [atom]]
             [reagent-forms.core :refer [bind-fields init-field value-of]]))
 
+
 ;; Pure example from https://github.com/reagent-project/reagent-forms/tree/master/forms-example
 
 (defn row [label input]
@@ -41,11 +42,13 @@
       {:field :alert :id :person.last-name :event empty?}
       "last name is empty!"]]]
 
+   (input "age" :text :person.age)
    [:div.row
-    [:div.col-md-2 [:label "Age"]]
+    [:div.col-md-2]
     [:div.col-md-5
-     [:div
-      {:field :datepicker :id :age :date-format "yyyy/mm/dd" :inline true}]]]
+     [:div.alert.alert-success
+      {:field :alert :id :person.last-name :event empty?}
+      "age is empty!"]]]
 
    (input "email" :email :person.email)
    (row
@@ -57,13 +60,6 @@
    (input "kg" :numeric :weight-kg)
    (input "lb" :numeric :weight-lb)
 
-   [:hr]
-   [:h3 "BMI Calculator"]
-   (input "height" :numeric :height)
-   (input "weight" :numeric :weight)
-   (row "BMI"
-        [:input.form-control
-         {:field :numeric :fmt "%.2f" :id :bmi :disabled true}])
    [:hr]
 
    (row "Best friend"
@@ -166,5 +162,3 @@
        [:hr]
        [:h1 "Document State"]
        [edn->hiccup @doc]])))
-
-(reagent/render-component [page] (.getElementById js/document "app"))
