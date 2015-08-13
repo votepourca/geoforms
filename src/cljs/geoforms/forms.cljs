@@ -63,7 +63,7 @@
   (-> idea
       (update :urls #(into [] (vals (apply sorted-set %))))
       ;; just add to all districts for now
-      (assoc :districts @db/districts)))
+      (assoc :districts (:selected-districts @app-state))))
 
 (defn submit-idea!
   [doc]
