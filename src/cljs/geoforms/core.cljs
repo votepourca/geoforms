@@ -19,11 +19,6 @@
   [:div [:h2 "About geoforms"]
    [:div [:a {:href "#/"} "go to the home page"]]])
 
-(defn reagent-forms-example []
-  [:div [:h2 "Welcome to geoforms"]
-   [:div [:a {:href "#/about"} "go to about page"]]
-   [:div [:a {:href "#/"} "go to home"]]])
-
 (defn current-page []
   [:div [(session/get :current-page)]])
 
@@ -36,9 +31,6 @@
 
 (secretary/defroute "/about" []
   (session/put! :current-page #'about-page))
-
-(secretary/defroute "/reagent-forms-example" []
-  (session/put! :current-page #'reagent-forms-example))
 
 ;; -------------------------
 ;; History
