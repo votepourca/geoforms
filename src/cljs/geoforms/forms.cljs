@@ -41,16 +41,42 @@
       (assoc :email "Email is empty")
 
       (when-let [email (:email person)]
-        (nil? (re-find email-regex email)))
+        (and (seq email)
+             (nil? (re-find email-regex email))))
       (assoc :email "Email is not valid")
 
       (nil? (:age person))
       (assoc :age "Age is not set"))))
 
+(defn validate-idea
+  "Build map of {key error} pairs, where each {error} relates to idea.{key}"
+  [idea]
+  (cond-> {}
+    ;; TODO: user has signed
+
+    (empty? (:title idea))
+    (assoc :title "Title cannot be blank.")
+
+    (when-let [title (:title idea)]
+      (and (seq title)
+           (some (comp #{title} :title) @db/ideas)))
+    (assoc :title "Title must be unique")
+
+    (empty? (:category idea))
+    (assoc :category "Category must be set.")))
+
 (defn validate-user!
   "Update errors atom, and return true if there were any errors."
   [doc]
   (let [errors (validate-user @doc)]
+    (swap! doc assoc :errors errors)
+    (empty? errors)))
+
+(defn validate-idea!
+  "Update errors atom, and return true if there were any errors."
+  [doc]
+  (let [errors (validate-idea @doc)]
+    (prn errors)
     (swap! doc assoc :errors errors)
     (empty? errors)))
 
@@ -67,7 +93,6 @@
 
 (defn submit-idea!
   [doc]
-  (prn doc)
   (db/create-idea! doc))
 
 ;; forms
@@ -111,6 +136,13 @@
    [:div.col
     [:input.form-control {:field type :id id :placeholder label}]]])
 
+(defn error-field [key]
+  [:div.row
+   [:div.col-md-2]
+   [:div.col-md-5
+    [:div.alert.alert-danger
+     {:field :alert :id (str ":errors." (name key))}]]])
+
 ;;; COMPONENTS
 
 (defn district-toggle [d]
@@ -134,7 +166,7 @@
      :on-change #(swap! idea-doc assoc-in [:category]
                         (-> % .-target .-value))}
     [:option
-     {:value "" :disabled true :selected true}
+     {:value "", :disabled true, :selected true}
      "Pick a category..."]
     (for [c @db/categories]
       [:option {:value c :key (symbol c)} c])]])
@@ -161,13 +193,18 @@
 (def idea-template
   [:div
    (input "Idea title" :text :title)
+   (error-field :title)
+
    [select-cat-component]
+   (error-field :category)
+
    [:p
     [:textarea.form-control
      {:rows        "4"
       :placeholder "If necessary, add a description"
       :field       :textarea
       :id          :desc}]]
+
    (for [i (range 3)]
      [:div {:key i}
       (input "URL" :text (str ":urls." i))])])
@@ -179,37 +216,30 @@
     idea-doc
     #_ (fn [k v _] (prn k v _))]
    [:button.btn.btn-default
-    {:on-click #(-> @idea-doc normalize-idea submit-idea!)}
+    {:on-click #(when (validate-idea! idea-doc)
+                  (-> @idea-doc normalize-idea submit-idea!))}
     "Add your idea"]])
 
 (defn signature-component []
   [:div.well
    (input "first name" :text :person.first-name)
-   [:div.row
-    [:div.col-md-2]
-    [:div.col-md-5
-     [:div.alert.alert-danger
-      {:field :alert :id :errors.first-name}]]]
+   (error-field :first-name)
 
    (input "last name" :text :person.last-name)
-   [:div.row
-    [:div.col-md-2]
-    [:div.col-md-5
-     [:div.alert.alert-danger
-      {:field :alert :id :errors.last-name}]]]
+   (error-field :last-name)
 
    (input "email" :email :person.email)
-   [:div.row
-    [:div.col-md-2]
-    [:div.col-md-5
-     [:div.alert.alert-danger
-      {:field :alert :id :errors.email}]]]
+   (error-field :email)
 
    [:div.form-group
     (row "age"
          [:select.form-control {:field :list :id :person.age}
-          (for [a db/age-groups]
-            [:option {:value a :key a} (name a)])])]
+          (cons
+           [:option {:value "", :disabled true, :selected true, :key "disabled"}
+            "Pick an age..."]
+           (for [a db/age-groups]
+             [:option {:value a :key a} (name a)]))])]
+   (error-field :age)
 
    (radios-yes-no
     "I want to get noticed about my supported ideas progress."
