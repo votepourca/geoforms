@@ -32,16 +32,16 @@
    [:div.col-md-5 input]])
 
 (defn radio [label name value]
-  [:div.radio
+  [:span.radio
    [:label
     [:input {:field :radio :name name :value value}]
     label]])
 
 (defn radios-yes-no [label name]
   [:div
-   [:p label]
-   (radio "Yes" name true)
-   (radio "No"  name false)])
+   [:p label
+    (radio "Yes" name true)
+    (radio "No"  name false)]])
 
 (defn input [label type id]
   (row label [:input.form-control {:field type :id id}]))
@@ -71,146 +71,153 @@
     [:div.form-group
      [:select.form-control {:field :list :id :idea.category}
       [:option
-       {:value "" :disabled true}
-       "Pick a category..."]]])
+       {:value "" :disabled true :selected true}
+       "Pick a category..."]
+      (for [c @db/categories]
+        [:option {:value c :key c} c])]])
+
+(defn idea-form [district]
+  ;; a button to open a modal?
+  ;; what about wanting to create an idea for multiple districts?
+  )
 
 (defn list-idea-blocks-component []
   (let [districts @db/districts]
     [:div
      (doall
-      (for [d districts
+      (for [d     districts
             :when (selected-district? d)
-            :let [ideas (district-ideas d)]]
-        ^{:key d}
-        [:div
+            :let  [ideas (district-ideas d)]]
+        [:div {:key d}
          [:p [:strong d " - " (count ideas) " idea(s)"]]
-         (for [{:keys [id idea]} ideas]
-           ^{:key id}
-           [:div.checkbox
-            [:label
-             [:input {:type :checkbox :id id}]
-             idea]])
-         ;; should we put just name instead of id?
-         (input-placeholder (str "add an idea for " d) :text :idea.idea)
+         (for [{:keys [id title]} ideas]
+           [:div.checkbox {:key id}
+            [:label [:input {:type :checkbox :id id}] title]])
+         [idea-form d]
          [:br]]))]))
 
 (defn add-idea-component []
   [:div
-   ;; should we put just name instead of id ?
-   (input-placeholder "Add your idea" :text :idea.idea)
+   (input-placeholder "Idea title" :text :idea.idea)
    [select-cat-component]
    [:p
     [:textarea.form-control
      {:rows "4" :placeholder "If necessary, add a description"}]]
-   (input-placeholder "Add a reference URL" :text :idea.url.1)
-   (input-placeholder "Add a reference URL" :text :idea.url.2)
-   (input-placeholder "Add a reference URL" :text :idea.url.3)
+   (for [i (range 3)]
+     [:div {:key i}
+      (input-placeholder "Add a reference URL" :text (symbol (str "idea.url." i)))])
    [:button.btn.btn-default
-    #_{:on-click #(handle-add-idea)}
-    "Add"]])
+    {:on-click #(db/create-idea! {:title     "More pizza"
+                                  :desc      "Food for me"
+                                  :districts ["Brooklyn"]
+                                  :category  "Green"
+                                  :links     []})}
+    "Add your idea"]])
 
 (defn signature-component []
-  nil)
+  [:div.well
+   (input "first name" :text :person.first-name)
+   [:div.row
+    [:div.col-md-2]
+    [:div.col-md-5
+     [:div.alert.alert-danger
+      {:field :alert :id :errors.first-name}]]]
 
+   (input "last name" :text :person.last-name)
+   [:div.row
+    [:div.col-md-2]
+    [:div.col-md-5
+     [:div.alert.alert-success
+      {:field :alert :id :errors.last-name}]]]
+
+   (input "email" :email :person.email)
+   [:div.row
+    [:div.col-md-2]
+    [:div.col-md-5
+     [:div.alert.alert-danger
+      {:field :alert :id :errors.email}]]]
+
+   [:div.form-group
+    (row "age"
+         [:select.form-control {:field :list :id :person.age}
+          (for [a db/age-groups]
+            [:option {:value a :key a} (name a)])])]
+
+   (radios-yes-no
+    "I want to get noticed about my supported ideas progress."
+    :alert-idea?)
+
+   (radios-yes-no
+    "I want to get noticed about volonteer opportunities regarding ideas I voted for."
+    :alert-volunteer?)
+
+   (radios-yes-no
+    "I want to get noticed about major updates in my supported district(s)."
+    :alert-disctricts?)
+
+   (row
+    "comments"
+    [:textarea.form-control
+     {:field :textarea :id :comments}])])
 
 ;;; templates
-
-;; could just generate from the break points
-(def age-groups
-  [:17-
-   :18-24
-   :25-29
-   :30-34
-   :35-39
-   :40-44
-   :45-49
-   :50-54
-   :55-59
-   :60-64
-   :65-69
-   :70-74
-   :75-79
-   :80-84
-   :85+])
 
 (def form-template
   [:div
    [:h3 "1. Choose your district"]
    [select-districts-component]
+   [:hr]
 
    [:h3 "2. Check ideas you want to support!"]
-   [list-idea-blocks-component]
-
+   [:div.well
+    [list-idea-blocks-component]]
    [:hr]
-   [:p [:em "When 'add an idea' input field is clicked:"]]
-   [add-idea-component]
+   [:div.well
+    [add-idea-component]]
+   [:hr]
 
    [:h3 "3. Sign your choices"]
-   #_[signature-component]
-
-   [:div
-    (input "first name" :text :person.first-name)
-    [:div.row
-     [:div.col-md-2]
-     [:div.col-md-5
-      [:div.alert.alert-danger
-       {:field :alert :id :errors.first-name}]]]
-
-    (input "last name" :text :person.last-name)
-    [:div.row
-     [:div.col-md-2]
-     [:div.col-md-5
-      [:div.alert.alert-success
-       {:field :alert :id :person.last-name :event empty?}
-       "last name is empty!"]]]
-
-    [:div.form-group
-     [:label "age"]
-     [:select.form-control {:field :list :id :person.age}
-      (for [a age-groups]
-        [:option {:value a :key a} (name a)])]]
-
-    (input "email" :email :person.email)
-    [:div.row
-     [:div.col-md-2]
-     [:div.col-md-5
-      [:div.alert.alert-danger
-       {:field :alert :id :errors.email :event empty?}
-       "email is empty!"]]]
-
-    (radios-yes-no
-     "I want to get noticed about my supported ideas progress."
-     :subscribe-idea-alerts)
-
-    (radios-yes-no
-     "I want to get noticed about volonteer opportunities regarding ideas I voted for."
-     :subscribe-volonteer-idea-alerts)
-
-    (radios-yes-no
-     "I want to get noticed about major updates in my supported district(s)."
-     :subscribe-district-alerts)
-
-    (row
-     "comments"
-     [:textarea.form-control
-      {:field :textarea :id :comments}])]])
+   (signature-component)])
 
 
 ;;; PAGE
 
-(defn validate! [doc]
-  (if (empty? (get-in @doc [:person :first-name]))
-    (swap! doc assoc-in [:errors :first-name] "first name is empty")))
+(def email-regex #"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$")
 
-(defn submit! [doc]
+(defn validate-user
+  "Build map of {key error} pairs, where each {error} relates to persion.{key}"
+  [doc]
+  (let [person (:person doc)]
+    (cond-> {}
+      (empty? (:first-name person))
+      (assoc :first-name "First name is empty")
+
+      (empty? (:last-name person))
+      (assoc :last-name "Last name is empty")
+
+      (empty? (:email person))
+      (assoc :email "Email is empty")
+
+      (when-let [email (:email person)]
+        (nil? (re-find email-regex email)))
+      (assoc :email "Email is not valid"))))
+
+(defn validate-user!
+  "Update errors atom, and return true if there were any errors."
+  [doc]
+  (let [errors (validate-user @doc)]
+    (swap! doc assoc :errors errors)
+    (empty? errors)))
+
+(defn submit!
+  "Ensure the signing user exists, and mark their support for various ide"
+  [doc]
   )
 
 (defn page []
   (let [doc (atom {})]
     (fn []
       [:div
-       [:div.page-header [:h1 "Sample Form"]]
-
        [bind-fields
         form-template
         doc
@@ -218,6 +225,6 @@
         (fn [document])]
 
        [:button.btn.btn-default
-        {:on-click #(and (validate! doc)
-                         (submit! doc))}
+        {:on-click #(when (validate-user! doc)
+                      (submit! doc))}
         "Submit"]])))

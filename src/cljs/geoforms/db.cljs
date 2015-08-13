@@ -49,6 +49,26 @@
   [:users (munge- email) :supports])
 
 
+;; constants
+
+(def age-groups
+  [:17-
+   :18-24
+   :25-29
+   :30-34
+   :35-39
+   :40-44
+   :45-49
+   :50-54
+   :55-59
+   :60-64
+   :65-69
+   :70-74
+   :75-79
+   :80-84
+   :85+])
+
+
 ;; atoms
 
 (def email (atom nil))
@@ -83,13 +103,12 @@
                  (when-not supported? true))
     (swap! supported-ideas (if supported? disj conj) id)))
 
-(defn create-idea! [{:keys [idea desc category] :as a}]
-  (prn a)
+(defn create-idea! [{:keys [title desc category districts] :as idea}]
   (m/conj-in! ref [:ideas]
-              {:district [:a :b :c]
-               :idea     idea
-               :desc     desc
-               :category category}))
+              {:title     title
+               :desc      desc
+               :category  category
+               :districts districts}))
 
 (defn create-user!
   [{:keys [email] :as user}
@@ -122,23 +141,23 @@
 
 (load-fixtures!
  ideas-ref
- [{:timestamp  "2013-08-10 11:20:22"
+ [{:created-at "2013-08-10 11:20:22"
    :districts  ["Brooklyn"]
-   :idea       "New skatepark"
+   :title      "New skatepark"
    :desc       "Would be really nice to have a new skatepark"
    :links      ["http://lapresse.ca/article-2"]
    :supporters [""]
    :category   "Other..."}
-  {:timestamp  "2013-08-10 11:20:24"
+  {:created-at "2013-08-10 11:20:24"
    :districts  ["Manhattan"]
-   :idea       "More police to prevent stealing"
+   :title      "More police to prevent stealing"
    :desc       ""
    :links      ["http://lapresse.ca/article-1"]
    :supporters [""]
    :category   "Security"}
-  {:timestamp  "2013-08-10 11:20:26"
+  {:created-at "2013-08-10 11:20:26"
    :districts  ["Manhattan"]
-   :idea       "Create a park near fifth avenue"
+   :title      "Create a park near fifth avenue"
    :desc       "Would be awesome to have a park on broadway near fith avenue."
    :links      ["http://lapresse.ca/article-56"]
    :supporters ["email@email.com" "email2@email.com" "john@hotmail.com"]
@@ -146,7 +165,7 @@
 
 (load-fixtures!
  users-ref
- [{:created          "2013-08-10 11:20:22"
+ [{:created-at       "2013-08-10 11:20:22"
    :fullname         "Leon Talbot"
    :email            "email@email.com"
    :zip-code         "G21 2C5"
@@ -154,9 +173,9 @@
    :annual-revenue   ""
    :alert-ideas?     true
    :alert-volunteer? false
-   :alert-district?  true
+   :alert-districts? true
    :comments         ""}
-  {:created          "2013-08-10 11:20:22"
+  {:created-at       "2013-08-10 11:20:22"
    :fullname         "John Talbot"
    :email            "john@hotmail.com"
    :zip-code         "G21 2C3"
@@ -164,9 +183,9 @@
    :annual-revenue   ""
    :alert-ideas?     true
    :alert-volunteer? false
-   :alert-district?  true
+   :alert-districts? true
    :comments         ""}
-  {:created          "2013-08-10 11:20:22"
+  {:created-at       "2013-08-10 11:20:22"
    :fullname         "Marc Talbot"
    :email            "email2@email.com"
    :zip-code         "G21 2C2"
@@ -174,7 +193,7 @@
    :annual-revenue   ""
    :alert-ideas?     true
    :alert-volunteer? false
-   :alert-district?  true
+   :alert-districts? true
    :comments         "better UX please. Thanks."}])
 
 (load-fixtures!
