@@ -61,7 +61,7 @@
 
     (when-let [title (:title idea)]
       (and (seq title)
-           (some (comp #{title} :title) @db/ideas)))
+           (some (comp #{title} :title) (district-ideas @db/selected-district))))
     (assoc :title (str (snippet :title) " " (snippet :already-used)))
 
     (empty? (:category idea))
@@ -78,7 +78,6 @@
   "Update errors atom, and return true if there were any errors."
   [doc]
   (let [errors (validate-idea @doc)]
-    (prn errors)
     (swap! doc assoc :errors errors)
     (empty? errors)))
 
@@ -90,8 +89,7 @@
 (defn normalize-idea [idea]
   (-> idea
       (update :urls #(into [] (vals (apply sorted-set %))))
-      ;; just add to all districts for now
-      (assoc :districts (selected-districts))))
+      (assoc :districts [@db/selected-district])))
 
 (defn submit-idea!
   [doc]
