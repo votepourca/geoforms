@@ -290,7 +290,7 @@
         [bind-fields
          form-template
          user-doc
-         (fn [k v _]
+         #_ (fn [k v _]
            (let [after (assoc-in @user-doc k v)
                  errors (validate-user after)]
              (assoc after :errors errors)))]
