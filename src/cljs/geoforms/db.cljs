@@ -329,3 +329,8 @@
 (load-fixtures!
  districts-ref
  ["Manhattan" "Brooklyn" "Queens" "Other districts"])
+
+(defn init-session []
+  ;; TODO: to be more robust, should really handle failures here,
+  ;; and defer rest of app loading
+  (m/auth-anon ref prn))
