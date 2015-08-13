@@ -147,15 +147,15 @@
 
    (radios-yes-no
     "I want to get noticed about my supported ideas progress."
-    :alert-ideas?)
+    :person.alert-ideas?)
 
    (radios-yes-no
     "I want to get noticed about volonteer opportunities regarding ideas I voted for."
-    :alert-volunteer?)
+    :person.alert-volunteer?)
 
    (radios-yes-no
     "I want to get noticed about major updates in my supported district(s)."
-    :alert-districts?)
+    :person.alert-districts?)
 
    (row
     "comments"
@@ -217,19 +217,16 @@
 (defn submit!
   "Ensure the signing user exists and their support is noted."
   [doc]
-  (prn doc @db/supported-ideas)
-  (comment
-    (db/create-user! user-doc db/supported-ideas)))
+  (db/create-user! (:person doc) @db/supported-ideas))
 
 (defn page []
-  (let [doc (atom {:person {:first-name "Blake"
-                            :last-name  "Hake"
-                            :email      "blake@hake.fake.com"
-                            :age        :18-24}
-
-                   :alert-ideas?     true
-                   :alert-volunteer? true
-                   :alert-districts? true})]
+  (let [doc (atom {:person {:first-name       "Blake"
+                            :last-name        "Hake"
+                            :email            "blake@hake.fake.com"
+                            :age              :18-24
+                            :alert-ideas?     true
+                            :alert-volunteer? true
+                            :alert-districts? true}})]
     (fn []
       [:div
        [bind-fields

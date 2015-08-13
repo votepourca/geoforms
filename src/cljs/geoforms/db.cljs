@@ -8,6 +8,28 @@
 
 ;; helpers
 
+(def mungings
+  {"." "__dot__"
+   "#" "__hash__"
+   "$" "__dollar__"
+   "/" "__slash__"
+   "[" "__lbrace__"
+   "]" "__rbrace__"})
+
+(defn munge- [s]
+  (if-not (string? s)
+    s
+    (reduce (fn [s [in out]] (str/replace s in out))
+            s
+            mungings)))
+
+(defn de-munge [s]
+  (if-not (string? s)
+    s
+    (reduce (fn [s [in out]] (str/replace s out in))
+            s
+            mungings)))
+
 (defn ->id-vec
   "Convert mapping of ids to maps, to vector of maps with id inside.
    eg. in: {:a {:b 2}, ...}
@@ -20,18 +42,12 @@
 (defn ->map-set
   "Convert a map to a set of the keys"
   [hsh]
-  (set (keys hsh)))
+  (set (map de-munge (keys hsh))))
 
 (defn ->set-map
   "Convert a set into a map of {element true}"
   [set]
-  (zipmap set (repeat true)))
-
-(defn munge- [email]
-  (-> email
-      (str/replace "@" "_at_")
-      (str/replace "." "_dot_")))
-
+  (zipmap (map munge- set) (repeat true)))
 
 ;; refs
 
@@ -49,7 +65,7 @@
   [:users (munge- email) :supports])
 
 (defn idea-supporters-path [id]
-  [:ideas id :supports])
+  [:ideas id :supporters])
 
 ;; constants
 
@@ -106,14 +122,14 @@
   "Update user to (only) reference all idea-ids"
   [user-email idea-ids]
   ;; upsert all associations (implicit deletes)
-  (let [path (conj (supported-ideas-path user-email))]
+  (let [path (conj (supported-ideas-path (munge- user-email)))]
     (m/reset-in! ref path (->set-map idea-ids))))
 
 (defn- set-idea->user
   "Update reference from idea to user"
   [idea-id user-email add?]
   ;; lean on setting value to nil to delete keys from map
-  (let [path (conj (idea-supporters-path idea-id) user-email)]
+  (let [path (conj (idea-supporters-path idea-id) (munge- user-email))]
     (m/reset-in! ref path add?)))
 
 (defn- set-ideas->user
@@ -144,8 +160,7 @@
     (let [add? (when supported? true)]
       (set-user-idea @email id add?))
     ;; otherwise update local user->idea map only
-    (swap! supported-ideas (if supported? conj disj) id))
-  (prn @supported-ideas))
+    (swap! supported-ideas (if supported? conj disj) id)))
 
 (defn create-idea! [{:keys [title desc category districts] :as idea}]
   (m/conj-in! ref [:ideas]
