@@ -20,7 +20,8 @@
      (include-css (if (env :dev) "css/site.css" "css/site.min.css"))]
     [:body
      [:div#app
-      [:h3 "ClojureScript has not been compiled!"]
+      [:h3 "Geoforms"]
+      [:p "Loading..."]
       [:p "please run "
        [:b "lein figwheel"]
        " in order to start the compiler"]]

@@ -27,6 +27,15 @@
 
 (def form-template
   [:div
+
+   [:h3 "1. Choose your district"]
+
+   [:h3 "2. Check ideas you want to support!"]
+
+   [:h3 "3. Add your won ideas"]
+
+   [:h3 "4. Sign your choices"]
+
    (input "first name" :text :person.first-name)
    [:div.row
     [:div.col-md-2]
@@ -42,15 +51,32 @@
       {:field :alert :id :person.last-name :event empty?}
       "last name is empty!"]]]
 
-   (input "age" :text :person.age)
+   [:div.form-group
+    [:label "age"]
+    [:select.form-control {:field :list :id :person.age}
+     [:option {:key :17-} "17-"]
+     [:option {:key :18-24} "18-24"]
+     [:option {:key :25-29} "25-29"]
+     [:option {:key :30-34} "30-34"]
+     [:option {:key :35-39} "35-39"]
+     [:option {:key :40-44} "40-44"]
+     [:option {:key :45-49} "45-49"]
+     [:option {:key :50-54} "50-54"]
+     [:option {:key :55-59} "55-59"]
+     [:option {:key :60-64} "60-64"]
+     [:option {:key :65-69} "65-69"]
+     [:option {:key :70-74} "70-74"]
+     [:option {:key :75-79} "75-79"]
+     [:option {:key :80-84} "80-84"]
+     [:option {:key :85+} "85+"]]]
+
+   (input "email" :email :person.email)
    [:div.row
     [:div.col-md-2]
     [:div.col-md-5
-     [:div.alert.alert-success
-      {:field :alert :id :person.last-name :event empty?}
-      "age is empty!"]]]
-
-   (input "email" :email :person.email)
+     [:div.alert.alert-danger
+      {:field :alert :id :errors.email :event empty?}
+      "email is empty!"]]]
    (row
     "comments"
     [:textarea.form-control
