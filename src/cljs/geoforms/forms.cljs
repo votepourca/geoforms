@@ -7,7 +7,7 @@
 
 (def app-state
   (atom
-   {:selected-districts nil
+   {:selected-districts #{}
     :added-ideas nil
     :added-user  nil}))
 
@@ -16,10 +16,8 @@
          #(if (% d) (disj % d) (conj % d))))
 
 (defn selected-district? [d]
-  (if-let [selected (:selected-districts @app-state)]
-    (contains? selected d)
-    (do (swap! app-state assoc :selected-districts (set @db/districts))
-        true)))
+  (let [selected (:selected-districts @app-state)]
+    (contains? selected d)))
 
 (defn district-ideas [d]
   (filter (comp #(some #{d} %) :districts) @db/ideas))
