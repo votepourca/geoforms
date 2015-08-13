@@ -69,7 +69,7 @@
 
 ;; constants
 
-(def language :fr)
+(def language (atom :en))
 
 (def age-groups
   [:17-
@@ -100,6 +100,8 @@
 (def districts (mr/sync-list districts-ref))
 
 (def supported-ideas (atom #{}))
+
+(def selected-district (atom nil))
 
 (defn logout! []
   (ma/unlink! supported-ideas)
@@ -263,7 +265,7 @@
 
 
 (defn snippet [key]
-  (get-in @app-cms [language key]))
+  (get-in @app-cms [@language key]))
 
 (load-fixtures!
  ideas-ref
