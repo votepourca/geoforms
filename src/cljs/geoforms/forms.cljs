@@ -257,14 +257,18 @@
 (defn page []
   (fn []
     [:div
-     [bind-fields
-      form-template
-      user-doc
-      (fn [k v _]
-        (let [after (assoc-in @user-doc k v)
-              errors (validate-user after)]
-          (assoc after :errors errors)))]
+     (when (and (seq @db/districts)
+                (seq @db/categories)
+                (seq @db/ideas))
+       [:div
+        [bind-fields
+         form-template
+         user-doc
+         (fn [k v _]
+           (let [after (assoc-in @user-doc k v)
+                 errors (validate-user after)]
+             (assoc after :errors errors)))]
 
-     [:button.btn.btn-default
-      {:on-click #(when (validate-user! user-doc) (submit! @user-doc))}
-      "Submit"]]))
+        [:button.btn.btn-default
+         {:on-click #(when (validate-user! user-doc) (submit! @user-doc))}
+         "Submit"]])]))
