@@ -1,4 +1,5 @@
 (ns geoforms.db
+  (:require-macros [reagent.ratom :refer [reaction]])
   (:require [clojure.string :as str]
             [matchbox.core :as m]
             [matchbox.atom :as ma]
@@ -88,6 +89,21 @@
    :80-84
    :85+])
 
+(def category-translations
+  (atom {:en ["Greening"
+              "Mobility"
+              "Infrastructure"
+              "Shops"
+              "Activities"
+              "Habitation"
+              "Other"]
+         :fr ["Verdissement"
+              "Mobilité"
+              "Infrastructure"
+              "Commerces"
+              "Activités"
+              "Habitations"
+              "Autre"]}))
 
 ;; atoms
 
@@ -95,9 +111,22 @@
 
 (def ideas (mr/sync-r ideas-ref (comp ->id-vec sort)))
 
-(def categories (mr/sync-list categories-ref))
+(def categories (reaction (get @category-translations @language)))
 
-(def districts (mr/sync-list districts-ref))
+(def districts
+  (atom ["Beauport"
+         "Charlesbourg"
+         "Lairet"
+         "Maizerets"
+         "Méandres"
+         "Montcalm"
+         "Saint-Jean-Baptiste"
+         "Saint-Roch"
+         "Saint-Sauveur"
+         "Sainte-Foy"
+         "Sillery"
+         "Vieux-Limoilou"
+         "Autre"]))
 
 (def supported-ideas (atom #{}))
 
