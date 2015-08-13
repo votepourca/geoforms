@@ -59,6 +59,35 @@
   [doc]
   (db/create-user! (:person doc) @db/supported-ideas))
 
+(defn normalize-idea [idea]
+  (-> idea
+      (update :urls #(into [] (vals (apply sorted-set %))))
+      ;; just add to all districts for now
+      (assoc :districts @db/districts)))
+
+(defn submit-idea!
+  [doc]
+  (prn doc)
+  (db/create-idea! doc))
+
+;; forms
+
+(defonce user-doc
+  (atom {:person {:first-name       "Blake"
+                  :last-name        "Hake"
+                  :email            "blake@hake.fake.com"
+                  :age              :18-24
+                  :alert-ideas?     true
+                  :alert-volunteer? true
+                  :alert-districts? true}}))
+
+(defonce idea-doc
+  (atom {:title     nil
+         :desc      nil
+         :districts nil
+         :category  nil
+         :links     nil}))
+
 ;;; view helpers
 
 (defn row [label input]
@@ -103,13 +132,16 @@
      [district-toggle d])])
 
 (defn select-cat-component []
-    [:div.form-group
-     [:select.form-control {:field :list :id :idea.category}
-      [:option
-       {:value "" :disabled true :selected true}
-       "Pick a category..."]
-      (for [c @db/categories]
-        [:option {:value c :key c} c])]])
+  [:div.form-group
+   [:select.form-control
+    {:value (get-in @idea-doc [:category])
+     :on-change #(swap! idea-doc assoc-in [:category]
+                        (-> % .-target .-value))}
+    [:option
+     {:value "" :disabled true :selected true}
+     "Pick a category..."]
+    (for [c @db/categories]
+      [:option {:value c :key (symbol c)} c])]])
 
 (defn list-idea-blocks-component []
   (let [districts @db/districts]
@@ -130,25 +162,28 @@
          [:a.btn.btn-xs.btn-default {:disabled true} (str "Add idea to " d)]
          [:br]]))]))
 
-(defn add-idea-form []
+(def idea-template
   [:div
-   (input "Idea title" :text :idea.idea)
+   (input "Idea title" :text :title)
    [select-cat-component]
    [:p
     [:textarea.form-control
-     {:rows "4" :placeholder "If necessary, add a description"}]]
+     {:rows        "4"
+      :placeholder "If necessary, add a description"
+      :field       :textarea
+      :id          :desc}]]
    (for [i (range 3)]
      [:div {:key i}
-      (input-placeholder "Add a reference URL" :text (symbol (str "idea.url." i)))])])
+      (input "URL" :text (str ":urls." i))])])
 
 (defn add-idea-component []
   [:div
+   [bind-fields
+    idea-template
+    idea-doc
+    #_ (fn [k v _] (prn k v _))]
    [:button.btn.btn-default
-    {:on-click #(db/create-idea! {:title     "More pizza"
-                                  :desc      "Food for me"
-                                  :districts ["Brooklyn"]
-                                  :category  "Green"
-                                  :links     []})}
+    {:on-click #(-> @idea-doc normalize-idea submit-idea!)}
     "Add your idea"]])
 
 (defn signature-component []
@@ -218,15 +253,6 @@
 
 
 ;;; PAGE
-
-(defonce user-doc
-  (atom {:person {:first-name       "Blake"
-                  :last-name        "Hake"
-                  :email            "blake@hake.fake.com"
-                  :age              :18-24
-                  :alert-ideas?     true
-                  :alert-volunteer? true
-                  :alert-districts? true}}))
 
 (defn page []
   (fn []
