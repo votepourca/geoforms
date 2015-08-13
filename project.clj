@@ -93,9 +93,12 @@
                        :env {:production true}
                        :aot :all
                        :omit-source true
-                       :cljsbuild {:jar true
+                       :cljsbuild {;; :jar true
                                    :builds {:app
                                              {:source-paths ["env/prod/cljs"]
                                               :compiler
                                               {:optimizations :advanced
+                                               :output-to     "resources/public/js/app_prod.js"
+                                               :output-dir    "resources/public/js/out_prod"
+                                               :asset-path   "js/out_prod"
                                                :pretty-print false}}}}}})
