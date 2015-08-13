@@ -13,7 +13,9 @@
 
 (defn toggle-district! [d]
   (swap! app-state update :selected-districts
-         #(if (% d) (disj % d) (conj % d))))
+         #(do (when (and (= d @db/selected-district) (% d))
+                (reset! db/selected-district nil))
+              (if (% d) (disj % d) (conj % d)))))
 
 (defn selected-districts []
   (:selected-districts @app-state))
@@ -172,27 +174,27 @@
 
 (defn list-idea-blocks-component []
   (let [districts @db/districts]
-    [:div
-     (doall
-      (interpose
-       [:br]
-       (for [d     districts
-             :when (selected-district? d)
-             :let  [ideas (district-ideas d)]]
-         [:div {:key d}
-          [:p [:strong (str d " - " (count ideas) " " (snippet :idea) "(s)")]]
-          (for [{:keys [id title]} ideas]
-            [:div.checkbox {:key id
-                            :on-change #(let [supported? (-> % .-target .-checked)]
-                                          (db/set-idea-support! id supported?))}
-             [:label [:input {:type :checkbox :id id}] title]])
-          [:a.btn.btn-xs.btn-default
-           {:disabled (= d @db/selected-district)
-            :on-click #(reset! db/selected-district d)}
-           (str (snippet :add-idea-to) " " d)]
-          [:br]])))]))
+    (into
+     [:div]
+     (interpose
+      [:br]
+      (for [d     districts
+            :when (selected-district? d)
+            :let  [ideas (district-ideas d)]]
+        [:div {:key d}
+         [:p [:strong (str d " - " (count ideas) " " (snippet :idea) "(s)")]]
+         (for [{:keys [id title]} ideas]
+           [:div.checkbox {:key id
+                           :on-change #(let [supported? (-> % .-target .-checked)]
+                                         (db/set-idea-support! id supported?))}
+            [:label [:input {:type :checkbox :id id}] title]])
+         [:a.btn.btn-xs.btn-success
+          {:disabled (= d @db/selected-district)
+           :on-click #(reset! db/selected-district d)}
+          (str (snippet :add-idea-to) " " d)]
+         [:br]])))))
 
-(def idea-template
+(defn idea-template []
   [:div
    (input-placeholder (snippet :idea-title) :text :title)
    (error-field :title)
@@ -214,8 +216,10 @@
 
 (defn add-idea-component []
   [:div
+   [:div.form-group
+    [:input.form-control {:disabled true, :value @db/selected-district}]]
    [bind-fields
-    idea-template
+    (idea-template)
     idea-doc
     #_ (fn [k v _] (prn k v _))]
    [:button.btn.btn-default
@@ -310,6 +314,6 @@
                      errors (validate-user after)]
                  (assoc after :errors errors)))]
 
-         [:button.btn.btn-default
+         [:button.btn.btn-primary
           {:on-click #(when (validate-user! user-doc) (submit! @user-doc))}
           (snippet :submit)]])])])
