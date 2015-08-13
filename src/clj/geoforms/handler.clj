@@ -21,12 +21,13 @@
      #_(include-css "https://www.votepour.ca/assets/stylesheets/geoforms.css")]
     [:body {:style "height: 100%"}
      [:div#app
-      [:h3 "Votepour.ca / Geoforms"]
+      [:p "Votepour.ca / Geoforms"]
       [:p "Chargement... / Loading..."]
-      (when (env :dev)
+      (if (env :dev)
         [:p "please run "
          [:b "lein figwheel"]
-         " in order to start the compiler"])]
+         " in order to start the compiler"]
+        [:p "Problèmes de chargement ? SVP contactez info@votepour.ca / Not loading? Please contact info@votepour.ca"])]
      (include-js "https://cdnjs.cloudflare.com/ajax/libs/es5-shim/4.1.10/es5-shim.min.js")
      (include-js "https://cdnjs.cloudflare.com/ajax/libs/es5-shim/4.1.10/es5-sham.min.js")
      (include-js "js/app.js")
