@@ -232,8 +232,10 @@
        [bind-fields
         form-template
         doc
-        (fn [document])
-        (fn [document])]
+        (fn [k v _]
+          (let [after (assoc-in @doc k v)
+                errors (validate-user after)]
+            (assoc after :errors errors)))]
 
        [:button.btn.btn-default
         {:on-click #(when (validate-user! doc)
