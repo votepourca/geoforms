@@ -18,7 +18,7 @@
      (include-css "//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css")
      (include-css "//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css")
      (include-css (if (env :dev) "css/site.css" "css/site.min.css"))]
-    [:body
+    [:body {:style "height: 100%"}
      [:div#app
       [:h3 "Geoforms"]
       [:p "Loading..."]

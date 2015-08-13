@@ -22,7 +22,7 @@
 
 (def app-ideas
   (atom
-   [{:id "1"
+   [{:id "i-1"
      :timestamp "2013-08-10 11:20:22"
      :districts ["Brooklyn"]
      :idea "New skatepark"
@@ -30,7 +30,7 @@
      :links ["http://lapresse.ca/article-2"]
      :supporters [""]
      :category "Other..."}
-    {:id "2"
+    {:id "i-2"
      :timestamp "2013-08-10 11:20:24"
      :districts ["Manhattan"]
      :idea "More police to prevent steeling"
@@ -38,7 +38,7 @@
      :links ["http://lapresse.ca/article-1"]
      :supporters [""]
      :category "Security"}
-    {:id "3"
+    {:id "i-3"
      :timestamp "2013-08-10 11:20:26"
      :districts ["Manhattan"]
      :idea "Create a park near fifth avenue"
@@ -85,7 +85,7 @@
    ["Shops" "Security" "Green" "Other..."]))
 
 (def app-districts
-  (atom ["Manhattan" "Brooklyn" "Queens" "Other"]))
+  (atom ["Manhattan" "Brooklyn" "Queens" "Other districts"]))
 
 
 ;;; STATE
@@ -110,34 +110,95 @@
     [:input {:field :radio :name name :value value}]
     label]])
 
+(defn radios-yes-no [label name]
+  [:div
+   [:p label]
+   (radio "Yes" name true)
+   (radio "No" name false)])
+
 (defn input [label type id]
   (row label [:input.form-control {:field type :id id}]))
+
+(defn input-placeholder [label type id]
+  [:div.row
+   [:div.col
+    [:input.form-control {:field type :id id :placeholder label}]]])
 
 (defn friend-source [text]
   (filter
    #(-> % (.toLowerCase %) (.indexOf text) (> -1))
    ["Alice" "Alan" "Bob" "Beth" "Jim" "Jane" "Kim" "Rob" "Zoe"]))
 
+
+;;; COMPONENTS
+
+(defn select-districts-component []
+  [:div.btn-group {:field :multi-select :id :every.position}
+   (for [d @app-districts]
+     [:button.btn.btn-default {:key (keyword d)} d])])
+
+(defn select-cat-component []
+    [:div.form-group
+     [:select.form-control {:field :list :id :idea.category}
+      [:option
+       {:value "" :disabled "disabled" :selected "selected"}
+       "Pick a category..."]
+      (for [c @app-cats]
+        [:option {:key (keyword c)} c])]])
+
+(defn list-idea-blocks-component []
+  nil)
+
+(defn add-idea-component []
+    [:div
+     (input-placeholder "Add your idea" :text :idea.idea) ;; should we put just name instead of id ?
+     [select-cat-component]
+     [:p
+      [:textarea.form-control
+       {:rows "4" :placeholder "If necessary, add a description"}]]
+     (input-placeholder "Add a reference URL" :text :idea.url.1)
+     (input-placeholder "Add a reference URL" :text :idea.url.2)
+     (input-placeholder "Add a reference URL" :text :idea.url.3)
+     [:button.btn.btn-default
+      #_{:on-click #(handle-add-idea)}
+      "Add"]])
+
+(defn signature-component []
+  nil)
+
+;;; TEMPLATE
+
 (def form-template
   [:div
-
    [:h3 "1. Choose your district"]
-   [:div.btn-group {:field :multi-select :id :every.position}
-    (for [d @app-districts]
-      [:button.btn.btn-default {:key (keyword d)} d])]
-
+   [select-districts-component]
 
    [:h3 "2. Check ideas you want to support!"]
+   #_[list-idea-blocks-component]
 
-   [:div.checkbox
-    [:label
-     [:input.form-control {:field :checkbox :id :i-123}]
-     "A new park near fifth avenue in Times Square"]]
+   [:div
+    (for [d (:selected-districts @app-state)
+          :let [selected-ideas
+                (filter (fn [i] (some #(= % d) (:districts i)))
+                        @app-ideas)]]
+      [:div
+       [:p [:strong d " - " (count selected-ideas) " idea(s)"]]
+       (for [i selected-ideas]
+         [:div.checkbox
+          [:label
+           [:input.form-control {:field :checkbox :id (:id i)}]
+           (:idea i)]])
+       (input-placeholder (str "add an idea for " d) :text :idea.idea) ;; should we put just name instead of id ?
+       [:br]])]
 
-   [:h3 "3. Add your won ideas"]
+   [:hr]
+   [:p [:em "When 'add an idea' input field is clicked:"]]
+   [add-idea-component]
 
-   [:h3 "4. Sign your choices"]
+   [:h3 "3. Sign your choices"]
+   #_[signature-component]
 
+   [:div
    (input "first name" :text :person.first-name)
    [:div.row
     [:div.col-md-2]
@@ -179,12 +240,25 @@
      [:div.alert.alert-danger
       {:field :alert :id :errors.email :event empty?}
       "email is empty!"]]]
+
+    (radios-yes-no
+     "I want to get noticed about my supported ideas progress."
+     :subscribe-idea-alerts)
+
+    (radios-yes-no
+     "I want to get noticed about volonteer opportunities regarding ideas I voted for."
+     :subscribe-volonteer-idea-alerts)
+
+    (radios-yes-no
+     "I want to get noticed about major updates in my supported district(s)."
+     :subscribe-district-alerts)
+
    (row
     "comments"
     [:textarea.form-control
-     {:field :textarea :id :comments}])
-
+     {:field :textarea :id :comments}])]
    [:hr]
+   [:h4 "This is not useful anymore (from reagent-forms example)"]
    (input "kg" :numeric :weight-kg)
    (input "lb" :numeric :weight-lb)
 
@@ -208,46 +282,10 @@
      :placeholder "N/A"
      :id :awesomeness}]
 
-   [:input {:field :range :min 1 :max 10 :id :awesomeness}]
+   [:input {:field :range :min 1 :max 10 :id :awesomeness}]])
 
-   [:h3 "option list"]
-   [:div.form-group
-    [:label "pick an option"]
-    [:select.form-control {:field :list :id :many.options}
-     [:option {:key :foo} "foo"]
-     [:option {:key :bar} "bar"]
-     [:option {:key :baz} "baz"]]]
 
-   (radio
-    "Option one is this and that—be sure to include why it's great"
-    :foo :a)
-   (radio
-    "Option two can be something else and selecting it will deselect option one"
-    :foo :b)
-
-   [:h3 "multi-select buttons"]
-   [:div.btn-group {:field :multi-select :id :every.position}
-    [:button.btn.btn-default {:key :left} "Left"]
-    [:button.btn.btn-default {:key :middle} "Middle"]
-    [:button.btn.btn-default {:key :right} "Right"]]
-
-   [:h3 "single-select buttons"]
-   [:div.btn-group {:field :single-select :id :unique.position}
-    [:button.btn.btn-default {:key :left} "Left"]
-    [:button.btn.btn-default {:key :middle} "Middle"]
-    [:button.btn.btn-default {:key :right} "Right"]]
-
-   [:h3 "single-select list"]
-   [:div.list-group {:field :single-select :id :pick-one}
-    [:div.list-group-item {:key :foo} "foo"]
-    [:div.list-group-item {:key :bar} "bar"]
-    [:div.list-group-item {:key :baz} "baz"]]
-
-   [:h3 "multi-select list"]
-   [:ul.list-group {:field :multi-select :id :pick-a-few}
-    [:li.list-group-item {:key :foo} "foo"]
-    [:li.list-group-item {:key :bar} "bar"]
-    [:li.list-group-item {:key :baz} "baz"]]])
+;;; PAGE
 
 (defn page []
   (let [doc (atom {:person {:first-name "John"
@@ -265,7 +303,7 @@
                    :many {:options :bar}})]
     (fn []
       [:div
-       [:div.page-header [:h1 (:title @app-cms)]]
+       [:div.page-header [:h1 "Sample Form"]]
 
        [bind-fields
         form-template
@@ -285,7 +323,7 @@
          {:on-click
           #(if (empty? (get-in @doc [:person :first-name]))
              (swap! doc assoc-in [:errors :first-name]"first name is empty"))}
-         "save"]
+         "Submit"]
 
        [:hr]
        [:h1 "Document State"]
