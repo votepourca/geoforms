@@ -73,11 +73,7 @@
 ;; forms
 
 (defonce user-doc
-  (atom {:person {:first-name       "Blake"
-                  :last-name        "Hake"
-                  :email            "blake@hake.fake.com"
-                  :age              :18-24
-                  :alert-ideas?     true
+  (atom {:person {:alert-ideas?     true
                   :alert-volunteer? true
                   :alert-districts? true}}))
 
