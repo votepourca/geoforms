@@ -15,9 +15,11 @@
   (swap! app-state update :selected-districts
          #(if (% d) (disj % d) (conj % d))))
 
+(defn selected-districts []
+  (:selected-districts @app-state))
+
 (defn selected-district? [d]
-  (let [selected (:selected-districts @app-state)]
-    (contains? selected d)))
+  (contains? (selected-districts) d))
 
 (defn district-ideas [d]
   (filter (comp #(some #{d} %) :districts) @db/ideas))
@@ -87,7 +89,7 @@
   (-> idea
       (update :urls #(into [] (vals (apply sorted-set %))))
       ;; just add to all districts for now
-      (assoc :districts (:selected-districts @app-state))))
+      (assoc :districts (selected-districts))))
 
 (defn submit-idea!
   [doc]
@@ -258,43 +260,52 @@
 
 ;;; templates
 
-(def form-template
+(defn step-1 []
   [:div
    [:h3 (snippet :h-district)]
    [select-districts-component]
-   [:hr]
+   [:hr]])
 
+(defn step-2 []
+  [:div
    [:h3 (snippet :h-vote)]
    [:div.well
     [list-idea-blocks-component]]
-   [:hr]
+   [:hr]])
 
+(defn step-3 []
+  [:div
    [:h3 (snippet :h-add)]
    [:div.well
     [add-idea-component]]
-   [:hr]
+   [:hr]])
 
+(defn step-4 []
+  [:div
    [:h3 (snippet :h-sign)]
    (signature-component)])
-
 
 ;;; PAGE
 
 (defn page []
-  (fn []
-    [:div
-     (when (and (seq @db/districts)
-                (seq @db/categories)
-                (seq @db/ideas))
-       [:div
-        [bind-fields
-         form-template
-         user-doc
-         #_ (fn [k v _]
-           (let [after (assoc-in @user-doc k v)
-                 errors (validate-user after)]
-             (assoc after :errors errors)))]
+  [:div
+   (when (and (seq @db/districts)
+              (seq @db/categories)
+              (seq @db/ideas))
+     [:div
+      [step-1]
+      (when (seq (selected-districts))
+        [:div
+         [step-2]
+         [step-3]
+         [bind-fields
+          (step-4)
+          user-doc
+          #_ (fn [k v _]
+               (let [after (assoc-in @user-doc k v)
+                     errors (validate-user after)]
+                 (assoc after :errors errors)))]
 
-        [:button.btn.btn-default
-         {:on-click #(when (validate-user! user-doc) (submit! @user-doc))}
-         (snippet :submit)]])]))
+         [:button.btn.btn-default
+          {:on-click #(when (validate-user! user-doc) (submit! @user-doc))}
+          (snippet :submit)]])])])
