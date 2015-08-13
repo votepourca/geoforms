@@ -91,7 +91,9 @@
         [:div {:key d}
          [:p [:strong d " - " (count ideas) " idea(s)"]]
          (for [{:keys [id title]} ideas]
-           [:div.checkbox {:key id}
+           [:div.checkbox {:key id
+                           :on-change #(let [supported? (-> % .-target .-checked)]
+                                         (db/set-idea-support! id supported?))}
             [:label [:input {:type :checkbox :id id}] title]])
          [idea-form d]
          [:br]]))]))
@@ -127,7 +129,7 @@
    [:div.row
     [:div.col-md-2]
     [:div.col-md-5
-     [:div.alert.alert-success
+     [:div.alert.alert-danger
       {:field :alert :id :errors.last-name}]]]
 
    (input "email" :email :person.email)
@@ -145,7 +147,7 @@
 
    (radios-yes-no
     "I want to get noticed about my supported ideas progress."
-    :alert-idea?)
+    :alert-ideas?)
 
    (radios-yes-no
     "I want to get noticed about volonteer opportunities regarding ideas I voted for."
@@ -153,7 +155,7 @@
 
    (radios-yes-no
     "I want to get noticed about major updates in my supported district(s)."
-    :alert-disctricts?)
+    :alert-districts?)
 
    (row
     "comments"
@@ -200,7 +202,10 @@
 
       (when-let [email (:email person)]
         (nil? (re-find email-regex email)))
-      (assoc :email "Email is not valid"))))
+      (assoc :email "Email is not valid")
+
+      (nil? (:age person))
+      (assoc :age "Age is not set"))))
 
 (defn validate-user!
   "Update errors atom, and return true if there were any errors."
@@ -210,12 +215,21 @@
     (empty? errors)))
 
 (defn submit!
-  "Ensure the signing user exists, and mark their support for various ide"
+  "Ensure the signing user exists and their support is noted."
   [doc]
-  )
+  (prn doc @db/supported-ideas)
+  (comment
+    (db/create-user! user-doc db/supported-ideas)))
 
 (defn page []
-  (let [doc (atom {})]
+  (let [doc (atom {:person {:first-name "Blake"
+                            :last-name  "Hake"
+                            :email      "blake@hake.fake.com"
+                            :age        :18-24}
+
+                   :alert-ideas?     true
+                   :alert-volunteer? true
+                   :alert-districts? true})]
     (fn []
       [:div
        [bind-fields
@@ -226,5 +240,5 @@
 
        [:button.btn.btn-default
         {:on-click #(when (validate-user! doc)
-                      (submit! doc))}
+                      (submit! @doc))}
         "Submit"]])))

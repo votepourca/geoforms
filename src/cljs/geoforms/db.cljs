@@ -48,6 +48,8 @@
 (defn supported-ideas-path [email]
   [:users (munge- email) :supports])
 
+(defn idea-supporters-path [id]
+  [:ideas id :supports])
 
 ;; constants
 
@@ -93,15 +95,57 @@
 
 ;; mutators
 
-(defn toggle-idea-support!
+(defn- set-user->idea
+  "Update reference from user to idea"
+  [user-email idea-id add?]
+  ;; lean on setting value to nil to delete keys from map
+  (let [path (conj (supported-ideas-path user-email) idea-id)]
+    (m/reset-in! ref path add?)))
+
+(defn- set-user->ideas
+  "Update user to (only) reference all idea-ids"
+  [user-email idea-ids]
+  ;; upsert all associations (implicit deletes)
+  (let [path (conj (supported-ideas-path user-email))]
+    (m/reset-in! ref path (->set-map idea-ids))))
+
+(defn- set-idea->user
+  "Update reference from idea to user"
+  [idea-id user-email add?]
+  ;; lean on setting value to nil to delete keys from map
+  (let [path (conj (idea-supporters-path idea-id) user-email)]
+    (m/reset-in! ref path add?)))
+
+(defn- set-ideas->user
+  "Update all ideas to reference user"
+  [idea-ids user-email]
+  (doseq [id idea-ids]
+    (set-idea->user id user-email true)))
+
+(defn set-user-idea
+  "Update references between user in both directions"
+  [user-email idea-id add?]
+  (set-user->idea user-email idea-id add?)
+  (set-idea->user idea-id user-email add?))
+
+(defn set-user-ideas
+  "Mass update user to reference only given ideas.
+   Updates given ideas to reference back to user
+   BEWARE: this does not remove user references from other ideas"
+  [user-email idea-ids]
+  (set-user->ideas user-email idea-ids)
+  (set-ideas->user idea-ids user-email))
+
+(defn set-idea-support!
   "Toggle whether idea is supported by user"
   [id supported?]
-  ;; lean on setting to nil to delete
   (if @email
-    (m/reset-in! ref
-                 (conj (supported-ideas-path @email) id)
-                 (when-not supported? true))
-    (swap! supported-ideas (if supported? disj conj) id)))
+    ;; if user is signed in, update synced idea and user data directly
+    (let [add? (when supported? true)]
+      (set-user-idea @email id add?))
+    ;; otherwise update local user->idea map only
+    (swap! supported-ideas (if supported? conj disj) id))
+  (prn @supported-ideas))
 
 (defn create-idea! [{:keys [title desc category districts] :as idea}]
   (m/conj-in! ref [:ideas]
@@ -113,14 +157,14 @@
 (defn create-user!
   [{:keys [email] :as user}
    ideas]
+  (prn user)
   (let [path [:users (munge- email)]]
     ;; upsert the user
     (m/swap-in! ref path
                 (fn [{:keys [created-at] :as existing}]
                   (assoc user :created-at (or created-at m/SERVER_TIMESTAMP))))
     ;; upsert the supported ideas
-    (m/reset-in! ref (supported-ideas-path email)
-                 (->set-map ideas))))
+    (set-user-ideas email ideas)))
 
 
 ;; fixtures
@@ -146,21 +190,21 @@
    :title      "New skatepark"
    :desc       "Would be really nice to have a new skatepark"
    :links      ["http://lapresse.ca/article-2"]
-   :supporters [""]
+   :supporters (->set-map [])
    :category   "Other..."}
   {:created-at "2013-08-10 11:20:24"
    :districts  ["Manhattan"]
    :title      "More police to prevent stealing"
    :desc       ""
    :links      ["http://lapresse.ca/article-1"]
-   :supporters [""]
+   :supporters (->set-map [])
    :category   "Security"}
   {:created-at "2013-08-10 11:20:26"
    :districts  ["Manhattan"]
    :title      "Create a park near fifth avenue"
    :desc       "Would be awesome to have a park on broadway near fith avenue."
    :links      ["http://lapresse.ca/article-56"]
-   :supporters ["email@email.com" "email2@email.com" "john@hotmail.com"]
+   :supporters (->set-map ["email@email.com" "email2@email.com" "john@hotmail.com"])
    :category   "Green"}])
 
 (load-fixtures!
