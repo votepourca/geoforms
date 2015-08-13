@@ -5,7 +5,7 @@
 
 ;;; state and logic
 
-(def app-state
+(defonce app-state
   (atom
    {:selected-districts #{}
     :added-ideas nil
@@ -174,20 +174,23 @@
   (let [districts @db/districts]
     [:div
      (doall
-      (for [d     districts
-            :when (selected-district? d)
-            :let  [ideas (district-ideas d)]]
-        [:div {:key d}
-         [:p [:strong d " - " (count ideas) " " (snippet :idea) "(s)"]]
-         (for [{:keys [id title]} ideas]
-           [:div.checkbox {:key id
-                           :on-change #(let [supported? (-> % .-target .-checked)]
-                                         (db/set-idea-support! id supported?))}
-            [:label [:input {:type :checkbox :id id}] title]])
-         ;; a button to open a modal?
-         ;; what about wanting to create an idea for multiple districts?
-         [:a.btn.btn-xs.btn-default {:disabled true} (str (snippet :add-idea-to) " " d)]
-         [:br]]))]))
+      (interpose
+       [:br]
+       (for [d     districts
+             :when (selected-district? d)
+             :let  [ideas (district-ideas d)]]
+         [:div {:key d}
+          [:p [:strong (str d " - " (count ideas) " " (snippet :idea) "(s)")]]
+          (for [{:keys [id title]} ideas]
+            [:div.checkbox {:key id
+                            :on-change #(let [supported? (-> % .-target .-checked)]
+                                          (db/set-idea-support! id supported?))}
+             [:label [:input {:type :checkbox :id id}] title]])
+          [:a.btn.btn-xs.btn-default
+           {:disabled (= d @db/selected-district)
+            :on-click #(reset! db/selected-district d)}
+           (str (snippet :add-idea-to) " " d)]
+          [:br]])))]))
 
 (def idea-template
   [:div
@@ -297,7 +300,8 @@
       (when (seq (selected-districts))
         [:div
          [step-2]
-         [step-3]
+         (when @db/selected-district
+           [step-3])
          [bind-fields
           (step-4)
           user-doc
