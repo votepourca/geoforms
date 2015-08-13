@@ -93,7 +93,7 @@
 
 (def email (atom nil))
 
-(def ideas (mr/sync-r ideas-ref ->id-vec))
+(def ideas (mr/sync-r ideas-ref (comp ->id-vec sort)))
 
 (def categories (mr/sync-list categories-ref))
 
