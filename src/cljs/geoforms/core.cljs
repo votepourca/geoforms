@@ -4,7 +4,8 @@
               [secretary.core :as secretary :include-macros true]
               [goog.events :as events]
               [goog.history.EventType :as EventType]
-              geoforms.forms)
+              [geoforms.forms]
+              [geoforms.db :refer [snippet]])
     (:import goog.History))
 
 ;; -------------------------
@@ -20,7 +21,7 @@
    [:div [:a {:href "#/"} "go to the home page"]]])
 
 (defn reagent-forms-example []
-  [:div [:h2 "Active geoforms"]
+  [:div [:h2 (snippet :title)]
    [:div [:a {:href "#/"} "go to the home page"]]
    [geoforms.forms/page]])
 
