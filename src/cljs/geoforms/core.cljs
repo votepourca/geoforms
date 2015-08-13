@@ -5,7 +5,7 @@
               [goog.events :as events]
               [goog.history.EventType :as EventType]
               [geoforms.forms]
-              [geoforms.db :refer [snippet]])
+              [geoforms.db :refer [snippet] :as db])
     (:import goog.History))
 
 ;; -------------------------
@@ -58,4 +58,5 @@
 
 (defn init! []
   (hook-browser-navigation!)
+  (db/init-session)
   (mount-root))
