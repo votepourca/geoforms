@@ -20,7 +20,7 @@
    [:div [:a {:href "#/"} "go to the home page"]]])
 
 (defn reagent-forms-example []
-  [:div [:h2 "From Reagent-forms"]
+  [:div [:h2 "Active geoforms"]
    [:div [:a {:href "#/"} "go to the home page"]]
    [geoforms.forms/page]])
 
