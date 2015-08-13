@@ -13,7 +13,8 @@
 
 (defonce app-cms
   (atom
-   {:title "IdeaBox"
+   {:title "Support local ideas!"
+    :subtitle ""
     :instructions-district "1. Choose your district"
     :instructions-vote     "2. Check ideas you want to support!"
     :instructions-add      "3. Add your won ideas"
@@ -84,9 +85,19 @@
    ["Shops" "Security" "Green" "Other..."]))
 
 (def app-districts
-  (atom ["Manhattan" "Brooklyn" "Queens"]))
+  (atom ["Manhattan" "Brooklyn" "Queens" "Other"]))
 
 
+;;; STATE
+
+(def app-state
+  (atom
+   {:selected-districts @app-districts
+    :added-ideas nil
+    :added-user  nil}))
+
+
+;;; FNS
 
 (defn row [label input]
   [:div.row
@@ -112,9 +123,9 @@
 
    [:h3 "1. Choose your district"]
    [:div.btn-group {:field :multi-select :id :every.position}
-    [:button.btn.btn-default {:key :left} "Manhattan"]
-    [:button.btn.btn-default {:key :middle} "Brooklyn"]
-    [:button.btn.btn-default {:key :right} "Queens"]]
+    (for [d @app-districts]
+      [:button.btn.btn-default {:key (keyword d)} d])]
+
 
    [:h3 "2. Check ideas you want to support!"]
 
