@@ -215,12 +215,7 @@
     (set-user-ideas email ideas)))
 
 
-;; fixtures
-
-(defn load-fixtures! [ref values]
-  (m/deref ref (fn [data] (when-not (seq data)
-                           (doseq [v values]
-                             (m/conj! ref v))))))
+;; translations
 
 (def app-cms
   (atom
@@ -298,62 +293,36 @@
 (defn snippet [key]
   (get-in @app-cms [@language key]))
 
-(load-fixtures!
- ideas-ref
- [{:created-at "2013-08-10 11:20:22"
-   :districts  ["Brooklyn"]
-   :title      "New skatepark"
-   :desc       "Would be really nice to have a new skatepark"
-   :links      ["http://lapresse.ca/article-2"]
-   :supporters (->set-map [])
-   :category   "Other..."}
-  {:created-at "2013-08-10 11:20:24"
-   :districts  ["Manhattan"]
-   :title      "More police to prevent stealing"
-   :desc       ""
-   :links      ["http://lapresse.ca/article-1"]
-   :supporters (->set-map [])
-   :category   "Security"}
-  {:created-at "2013-08-10 11:20:26"
-   :districts  ["Manhattan"]
-   :title      "Create a park near fifth avenue"
-   :desc       "Would be awesome to have a park on broadway near fith avenue."
-   :links      ["http://lapresse.ca/article-56"]
-   :supporters (->set-map ["email@email.com" "email2@email.com" "john@hotmail.com"])
-   :category   "Green"}])
+;; fixtures
 
-(load-fixtures!
- users-ref
- [{:created-at       "2013-08-10 11:20:22"
-   :fullname         "Leon Talbot"
-   :email            "email@email.com"
-   :zip-code         "G21 2C5"
-   :age              "32"
-   :annual-revenue   ""
-   :alert-ideas?     true
-   :alert-volunteer? false
-   :alert-districts? true
-   :comments         ""}
-  {:created-at       "2013-08-10 11:20:22"
-   :fullname         "John Talbot"
-   :email            "john@hotmail.com"
-   :zip-code         "G21 2C3"
-   :age              "33"
-   :annual-revenue   ""
-   :alert-ideas?     true
-   :alert-volunteer? false
-   :alert-districts? true
-   :comments         ""}
-  {:created-at       "2013-08-10 11:20:22"
-   :fullname         "Marc Talbot"
-   :email            "email2@email.com"
-   :zip-code         "G21 2C2"
-   :age              "34"
-   :annual-revenue   ""
-   :alert-ideas?     true
-   :alert-volunteer? false
-   :alert-districts? true
-   :comments         "better UX please. Thanks."}])
+(defn load-fixtures! [ref values]
+  (m/deref ref (fn [data] (when-not (seq data)
+                           (doseq [v values]
+                             (m/conj! ref v))))))
+
+;; (load-fixtures!
+;;  ideas-ref
+;;  [{:created-at "2013-08-10 11:20:22"
+;;    :districts  ["Brooklyn"]
+;;    :title      "New skatepark"
+;;    :desc       "Would be really nice to have a new skatepark"
+;;    :links      ["http://lapresse.ca/article-2"]
+;;    :supporters (->set-map ["email@email.com" "email2@email.com" "john@hotmail.com"])
+;;    :supporters (->set-map [])
+;;    :category   "Other..."}])
+
+;; (load-fixtures!
+;;  users-ref
+;;  [{:created-at       "2013-08-10 11:20:22"
+;;    :fullname         "Leon Talbot"
+;;    :email            "email@email.com"
+;;    :zip-code         "G21 2C5"
+;;    :age              "32"
+;;    :annual-revenue   ""
+;;    :alert-ideas?     true
+;;    :alert-volunteer? false
+;;    :alert-districts? true
+;;    :comments         ""}])
 
 ;(load-fixtures!
  ;categories-ref
