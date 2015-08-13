@@ -263,7 +263,7 @@
 
 
 (defn snippet [key]
-  (get-in @app-cms [config/language key]))
+  (get-in @app-cms [language key]))
 
 (load-fixtures!
  ideas-ref
