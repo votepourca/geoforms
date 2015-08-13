@@ -4,7 +4,89 @@
             [reagent-forms.core :refer [bind-fields init-field value-of]]))
 
 
-;; Pure example from https://github.com/reagent-project/reagent-forms/tree/master/forms-example
+;; Example taken from https://github.com/reagent-project/reagent-forms/tree/master/forms-example
+
+
+;;; DATA
+
+;; should be in firebase
+
+(defonce app-cms
+  (atom
+   {:title "IdeaBox"
+    :instructions-district "1. Choose your district"
+    :instructions-vote     "2. Check ideas you want to support!"
+    :instructions-add      "3. Add your won ideas"
+    :instructions-sign     "4. Sign your choices"}))
+
+(def app-ideas
+  (atom
+   [{:id "1"
+     :timestamp "2013-08-10 11:20:22"
+     :districts ["Brooklyn"]
+     :idea "New skatepark"
+     :desc "Would be really nice to have a new skatepark"
+     :links ["http://lapresse.ca/article-2"]
+     :supporters [""]
+     :category "Other..."}
+    {:id "2"
+     :timestamp "2013-08-10 11:20:24"
+     :districts ["Manhattan"]
+     :idea "More police to prevent steeling"
+     :desc ""
+     :links ["http://lapresse.ca/article-1"]
+     :supporters [""]
+     :category "Security"}
+    {:id "3"
+     :timestamp "2013-08-10 11:20:26"
+     :districts ["Manhattan"]
+     :idea "Create a park near fifth avenue"
+     :desc "Would be awesome to have a park on broadway near fith avenue."
+     :links ["http://lapresse.ca/article-56"]
+     :supporters ["email@email.com" "email2@email.com" "john@hotmail.com"]
+     :category "Green"}]))
+
+(def app-users
+  (atom
+   [{:created "2013-08-10 11:20:22"
+     :fullname "Leon Talbot"
+     :email "email@email.com"
+     :zip-code "G21 2C5" ;; this is canadian zip code.
+     :age "32"
+     :annual-revenue ""
+     :subscribe-idea-alerts true
+     :subscribe-volonteer-idea-alerts false
+     :subscribe-district-alerts true
+     :comments ""}
+    {:created "2013-08-10 11:20:22"
+     :fullname "John Talbot"
+     :email "john@hotmail.com"
+     :zip-code "G21 2C3"
+     :age "33"
+     :annual-revenue ""
+     :subscribe-idea-alerts true
+     :subscribe-volonteer-idea-alerts false
+     :subscribe-district-alerts true
+     :comments ""}
+    {:created "2013-08-10 11:20:22"
+     :fullname "Marc Talbot"
+     :email "email2@email.com"
+     :zip-code "G21 2C2"
+     :age "34"
+     :annual-revenue ""
+     :subscribe-idea-alerts true
+     :subscribe-volonteer-idea-alerts false
+     :subscribe-district-alerts true
+     :comments "better UX please. Thanks."}]))
+
+(def app-cats
+  (atom
+   ["Shops" "Security" "Green" "Other..."]))
+
+(def app-districts
+  (atom ["Manhattan" "Brooklyn" "Queens"]))
+
+
 
 (defn row [label input]
   [:div.row
@@ -29,8 +111,17 @@
   [:div
 
    [:h3 "1. Choose your district"]
+   [:div.btn-group {:field :multi-select :id :every.position}
+    [:button.btn.btn-default {:key :left} "Manhattan"]
+    [:button.btn.btn-default {:key :middle} "Brooklyn"]
+    [:button.btn.btn-default {:key :right} "Queens"]]
 
    [:h3 "2. Check ideas you want to support!"]
+
+   [:div.checkbox
+    [:label
+     [:input.form-control {:field :checkbox :id :i-123}]
+     "A new park near fifth avenue in Times Square"]]
 
    [:h3 "3. Add your won ideas"]
 
@@ -163,7 +254,7 @@
                    :many {:options :bar}})]
     (fn []
       [:div
-       [:div.page-header [:h1 "Sample Form"]]
+       [:div.page-header [:h1 (:title @app-cms)]]
 
        [bind-fields
         form-template
