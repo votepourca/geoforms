@@ -23,7 +23,7 @@
                  [reagent-forms "0.5.5"]
                  [reagent-utils "0.1.5"]
                  [secretary "1.2.3"]
-                 [matchbox "0.0.7"]]
+                 [matchbox "0.0.8-SNAPSHOT"]]
 
   :plugins [[lein-environ "1.0.0"]
             [lein-asset-minifier "0.2.2"]]
