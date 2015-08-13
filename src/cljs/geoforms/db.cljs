@@ -353,13 +353,13 @@
    :alert-districts? true
    :comments         "better UX please. Thanks."}])
 
-(load-fixtures!
- categories-ref
- ["Shops" "Security" "Green" "Other..."])
+;(load-fixtures!
+ ;categories-ref
+ ;["Shops" "Security" "Green" "Other..."])
 
-(load-fixtures!
- districts-ref
- ["Manhattan" "Brooklyn" "Queens" "Other districts"])
+;(load-fixtures!
+ ;districts-ref
+ ;["Manhattan" "Brooklyn" "Queens" "Other districts"])
 
 (defn init-session []
   ;; TODO: to be more robust, should really handle failures here,
