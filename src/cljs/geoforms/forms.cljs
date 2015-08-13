@@ -170,27 +170,31 @@
     (for [c @db/categories]
       [:option {:value c :key (symbol c)} c])]])
 
+(defn district-ideas-component [d ideas]
+  [:div {:key d}
+   [:p [:strong (str d " (" (count ideas) ") ")]]
+   (for [{:keys [id title]} ideas]
+     [:div.checkbox {:key id
+                     :on-change #(let [supported? (-> % .-target .-checked)]
+                                   (db/set-idea-support! id supported?))}
+      [:label [:input {:type :checkbox :id id}] title]])
+   (when (not= d @db/selected-district)
+     [:a.btn.btn-xs.btn-success
+      {:on-click #(reset! db/selected-district d)}
+      (str (snippet :add-idea-to) " " d)])])
+
 (defn list-idea-blocks-component []
   (let [districts @db/districts]
     (into
      [:div]
      (interpose
       [:br]
-      (for [d     districts
-            :when (selected-district? d)
-            :let  [ideas (district-ideas d)]]
-        [:div {:key d}
-         [:p [:strong (str d " - " (count ideas) " " (snippet :idea) "(s)")]]
-         (for [{:keys [id title]} ideas]
-           [:div.checkbox {:key id
-                           :on-change #(let [supported? (-> % .-target .-checked)]
-                                         (db/set-idea-support! id supported?))}
-            [:label [:input {:type :checkbox :id id}] title]])
-         [:a.btn.btn-xs.btn-success
-          {:disabled (= d @db/selected-district)
-           :on-click #(reset! db/selected-district d)}
-          (str (snippet :add-idea-to) " " d)]
-         [:br]])))))
+      (map second
+           (sort
+            (for [d     districts
+                  :when (selected-district? d)
+                  :let  [ideas (district-ideas d)]]
+              [(- (count ideas)) [district-ideas-component d ideas]])))))))
 
 (defn idea-template []
   [:div
