@@ -32,21 +32,21 @@
   (let [person (:person doc)]
     (cond-> {}
       (empty? (:first-name person))
-      (assoc :first-name "First name is empty")
+      (assoc :first-name (str (snippet :first-name) " " (snippet :required)))
 
       (empty? (:last-name person))
-      (assoc :last-name "Last name is empty")
+      (assoc :last-name (str (snippet :last-name) " " (snippet :required)))
 
       (empty? (:email person))
-      (assoc :email "Email is empty")
+      (assoc :email (str (snippet :email) " " (snippet :required)))
 
       (when-let [email (:email person)]
         (and (seq email)
              (nil? (re-find email-regex email))))
-      (assoc :email "Email is not valid")
+      (assoc :email (str (snippet :email) " " (snippet :not-valid)))
 
       (nil? (:age person))
-      (assoc :age "Age is not set"))))
+      (assoc :age (str (snippet :age) " " (snippet :not-set))))))
 
 (defn validate-idea
   "Build map of {key error} pairs, where each {error} relates to idea.{key}"
@@ -55,15 +55,15 @@
     ;; TODO: user has signed
 
     (empty? (:title idea))
-    (assoc :title "Title cannot be blank.")
+    (assoc :title (str (snippet :title) " " (snippet :required)))
 
     (when-let [title (:title idea)]
       (and (seq title)
            (some (comp #{title} :title) @db/ideas)))
-    (assoc :title "Title must be unique")
+    (assoc :title (str (snippet :title) " " (snippet :already-used)))
 
     (empty? (:category idea))
-    (assoc :category "Category must be set.")))
+    (assoc :category (str (snippet :category) " " (snippet :not-set)))))
 
 (defn validate-user!
   "Update errors atom, and return true if there were any errors."
@@ -125,16 +125,15 @@
 (defn radios-yes-no [label name]
   [:div
    [:p label
-    (radio "Yes" name true)
-    (radio "No"  name false)]])
+    (radio (snippet :yes) name true)
+    (radio (snippet :no) name false)]])
 
 (defn input [label type id]
   (row label [:input.form-control {:field type :id id}]))
 
 (defn input-placeholder [label type id]
-  [:div.row
-   [:div.col
-    [:input.form-control {:field type :id id :placeholder label}]]])
+  [:div.form-group
+   [:input.form-control {:field type :id id :placeholder label}]])
 
 (defn error-field [key]
   [:div.row
@@ -167,7 +166,7 @@
                         (-> % .-target .-value))}
     [:option
      {:value "", :disabled true, :selected true}
-     "Pick a category..."]
+     (snippet :select-category)]
     (for [c @db/categories]
       [:option {:value c :key (symbol c)} c])]])
 
@@ -179,7 +178,7 @@
             :when (selected-district? d)
             :let  [ideas (district-ideas d)]]
         [:div {:key d}
-         [:p [:strong d " - " (count ideas) " idea(s)"]]
+         [:p [:strong d " - " (count ideas) " " (snippet :idea) "(s)"]]
          (for [{:keys [id title]} ideas]
            [:div.checkbox {:key id
                            :on-change #(let [supported? (-> % .-target .-checked)]
@@ -187,12 +186,12 @@
             [:label [:input {:type :checkbox :id id}] title]])
          ;; a button to open a modal?
          ;; what about wanting to create an idea for multiple districts?
-         [:a.btn.btn-xs.btn-default {:disabled true} (str "Add idea to " d)]
+         [:a.btn.btn-xs.btn-default {:disabled true} (str (snippet :add-idea-to) " " d)]
          [:br]]))]))
 
 (def idea-template
   [:div
-   (input "Idea title" :text :title)
+   (input-placeholder (snippet :idea-title) :text :title)
    (error-field :title)
 
    [select-cat-component]
@@ -201,13 +200,14 @@
    [:p
     [:textarea.form-control
      {:rows        "4"
-      :placeholder "If necessary, add a description"
+      :placeholder (str (snippet :add-description) " " (snippet :optional))
       :field       :textarea
       :id          :desc}]]
 
    (for [i (range 3)]
      [:div {:key i}
-      (input "URL" :text (str ":urls." i))])])
+      (input-placeholder (str (snippet :add-url) " " (snippet :optional))
+                         :text (str ":urls." i))])])
 
 (defn add-idea-component []
   [:div
@@ -218,43 +218,43 @@
    [:button.btn.btn-default
     {:on-click #(when (validate-idea! idea-doc)
                   (-> @idea-doc normalize-idea submit-idea!))}
-    "Add your idea"]])
+    (snippet :add-idea)]])
 
 (defn signature-component []
   [:div.well
-   (input "first name" :text :person.first-name)
+   (input (snippet :first-name) :text :person.first-name)
    (error-field :first-name)
 
-   (input "last name" :text :person.last-name)
+   (input (snippet :last-name) :text :person.last-name)
    (error-field :last-name)
 
-   (input "email" :email :person.email)
+   (input (snippet :email) :email :person.email)
    (error-field :email)
 
    [:div.form-group
-    (row "age"
+    (row (snippet :age)
          [:select.form-control {:field :list :id :person.age}
           (cons
            [:option {:value "", :disabled true, :selected true, :key "disabled"}
-            "Pick an age..."]
+            (snippet :select-age)]
            (for [a db/age-groups]
              [:option {:value a :key a} (name a)]))])]
    (error-field :age)
 
    (radios-yes-no
-    "I want to get noticed about my supported ideas progress."
+    (snippet :person.alert-ideas?)
     :person.alert-ideas?)
 
    (radios-yes-no
-    "I want to get noticed about volonteer opportunities regarding ideas I voted for."
+    (snippet :person.alert-volunteer?)
     :person.alert-volunteer?)
 
    (radios-yes-no
-    "I want to get noticed about major updates in my supported district(s)."
+    (snippet :person.alert-districts?)
     :person.alert-districts?)
 
    (row
-    "comments"
+    (snippet :comments)
     [:textarea.form-control
      {:field :textarea :id :comments}])])
 
@@ -299,4 +299,4 @@
 
         [:button.btn.btn-default
          {:on-click #(when (validate-user! user-doc) (submit! @user-doc))}
-         "Submit"]])]))
+         (snippet :submit)]])]))
