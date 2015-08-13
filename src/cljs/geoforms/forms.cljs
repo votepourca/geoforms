@@ -294,6 +294,11 @@
    [:h3 (snippet :h-sign)]
    (signature-component)])
 
+(defn completed-view []
+  [:div
+   [:h3 (snippet :completed-title)]
+   [:p (snippet :completed-message)]])
+
 ;;; PAGE
 
 (defn page []

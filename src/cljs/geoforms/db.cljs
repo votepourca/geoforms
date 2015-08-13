@@ -257,7 +257,8 @@
          :yes                         "Yes"
          :no                          "No"
          :new-ideas-saved-once-signed "Your new idea(s) will be saved once you sign and submit (see the bottom of the form)"
-         }
+         :completed-title             "Thank you!"
+         :complted-message           "Your choices have been submitted. If you've added ideas, it should be now public."}
     :fr {:page-title                  "Appuyez et suggérez des idées pour votre quartier!"
          :page-subtitle               ""
          :h-district                  "Étape 1. Choisissez votre quartier (ou vos quartiers)"
@@ -290,8 +291,9 @@
          :category                    "Catégorie"
          :yes                         "Oui"
          :no                          "Non"
-         :new-ideas-saved-once-signed "Votre idée ou vos idées seront sauvegardées dès que vous signerez et enverrez vos choix (voir le bas du formulaire)"}}))
-
+         :new-ideas-saved-once-signed "Votre idée ou vos idées seront sauvegardées dès que vous signerez et enverrez vos choix (voir le bas du formulaire)"
+         :complted-title              "Merci!"
+         :completed-message           "Vos choix ont été soumis. Si vous avez ajouté des idées, il devrait être désormais public."}}))
 
 (defn snippet [key]
   (get-in @app-cms [@language key]))
