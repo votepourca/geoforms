@@ -12,18 +12,17 @@
 ;; Views
 
 (defn home-page []
-  [:div [:h2 "Welcome to geoforms"]
-   [:div [:a {:href "#/about"} "go to about page"]]
-   [:div [:a {:href "#/reagent-forms-example"} "go to reagent-forms example"]]])
+  [:div [:h2 (snippet :page-title)]
+   [geoforms.forms/page]])
 
 (defn about-page []
   [:div [:h2 "About geoforms"]
    [:div [:a {:href "#/"} "go to the home page"]]])
 
 (defn reagent-forms-example []
-  [:div [:h2 (snippet :title)]
-   [:div [:a {:href "#/"} "go to the home page"]]
-   [geoforms.forms/page]])
+  [:div [:h2 "Welcome to geoforms"]
+   [:div [:a {:href "#/about"} "go to about page"]]
+   [:div [:a {:href "#/"} "go to home"]]])
 
 (defn current-page []
   [:div [(session/get :current-page)]])

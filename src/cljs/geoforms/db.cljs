@@ -69,7 +69,7 @@
 
 ;; constants
 
-(def language :en)
+(def language :fr)
 
 (def age-groups
   [:17-
@@ -193,18 +193,74 @@
 
 (def app-cms
   (atom
-   {:en {:title      "Support local ideas!"
-         :subtitle   ""
-         :h-district "1. Choose your district"
-         :h-vote     "2. Check ideas you want to support!"
-         :h-add      "3. Add your won ideas"
-         :h-sign     "4. Sign your choices"}
-    :fr {:title      "Soutiennent les idées locales!"
-         :subtitle   ""
-         :h-district "1. Choisissez votre quartier"
-         :h-vote     "2. Vérifier les idées que vous voulez soutenir!"
-         :h-add     "3. Ajouter vos idées gagné"
-         :h-sign     "4. Connectez-vous à votre choix"}}))
+   {:en {:page-title      "Support local ideas!"
+         :page-subtitle   ""
+         :h-district "Step 1. Choose your district"
+         :h-vote     "Step 2. Check ideas you want to support!"
+         :h-add      "Step 3. Add your own ideas"
+         :h-sign     "Step 4. Sign your choices"
+         :person.alert-ideas?    "I want to get noticed about my supported ideas progress."
+         :person.alert-volunteer?  "I want to get noticed about volonteer opportunities regarding ideas I voted for."
+         :person.alert-districts?  "I want to get noticed about major updates in my supported district(s)."
+         :comments "Comments"
+         :email "Email"
+         :last-name "Last Name"
+         :first-name "First Name"
+         :age "Age"
+         :add-description "Add a description"
+         :add-idea "Add your idea"
+         :optional "(optional)"
+         :idea-title "Idea title"
+         :add-idea-to "Add idea to"
+         :idea "idea"
+         :select-category "Select a category..."
+         :add-url "Add an URL"
+         :select-age "Select your age..."
+         :submit "Submit"
+         :not-valid "not valid"
+         :required "required"
+         :not-set "not set"
+         :already-used "already used"
+         :title "Title"
+         :category "Category"
+         :yes "Yes"
+         :no "No"
+         :new-ideas-saved-once-signed "Your new idea(s) will be saved once you sign and submit (see the bottom of the form)"
+         }
+    :fr {:page-title      "Appuyez et suggérez des idées pour votre quartier!"
+         :page-subtitle   ""
+         :h-district "Étape 1. Choisissez votre quartier (ou vos quartiers)"
+         :h-vote     "Étape 2. Cochez les idées que vous souhaitez appuyer!"
+         :h-add      "Étape 3. Ajoutez vos idées"
+         :h-sign     "Étape 4. Signez vos choix"
+         :person.alert-ideas?    "Je veux être tenu au courant de la progression des idées que j'ai appuyées."
+         :person.alert-volunteer?  "Je veux être informé des opportunités de bénévolat entourant les idées que j'ai appuyées."
+         :person.alert-districts?  "Je veux être informé de développements majeurs sur les activités de Votepour.ca dans mon quartier."
+         :comments "Commentaires"
+         :email "Courriel"
+         :last-name "Prénom"
+         :first-name "Nom"
+         :age "Âge"
+         :add-description "Ajoutez une description"
+         :add-idea "Ajoutez votre idée"
+         :optional "(facultatif)"
+         :idea-title "Titre de l'idée"
+         :add-idea-to "Ajoutez une idée à"
+         :idea "idée"
+         :select-category "Choisissez une catégorie"
+         :add-url "Ajoutez une URL de reférence"
+         :select-age "Selectionnez votre âge"
+         :submit "Envoyez"
+         :not-valid "non valide"
+         :required "requis"
+         :not-set "non choisie"
+         :already-used "déjà utilisé"
+         :title "Titre"
+         :category "Catégorie"
+         :yes "Oui"
+         :no "Non"
+         :new-ideas-saved-once-signed "Votre idée ou vos idées seront sauvegardées dès que vous signerez et enverrez vos choix (voir le bas du formulaire)"}}))
+
 
 (defn snippet [key]
   (get-in @app-cms [language key]))
