@@ -17,14 +17,19 @@
              :content "width=device-width, initial-scale=1"}]
      (include-css "//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css")
      (include-css "//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css")
+     (include-css "https://www.votepour.ca/assets/stylesheets/geoforms.css")
      (include-css (if (env :dev) "css/site.css" "css/site.min.css"))]
     [:body {:style "height: 100%"}
      [:div#app
-      [:h3 "Geoforms"]
-      [:p "Loading..."]
-      [:p "please run "
-       [:b "lein figwheel"]
-       " in order to start the compiler"]]
+      [:h3 "Votepour.ca / Geoforms"]
+      [:p "Chargement... / Loading..."]
+      (when (env :dev)
+        [:p "please run "
+         [:b "lein figwheel"]
+         " in order to start the compiler"])]
+     (include-js "https://cdnjs.cloudflare.com/ajax/libs/es5-shim/4.1.10/es5-shim.min.js")
+     (include-js "https://cdnjs.cloudflare.com/ajax/libs/es5-shim/4.1.10/es5-sham.min.js")
+     (include-js "https://www.votepour.ca/assets/javascripts/geoforms.js")
      (include-js "js/app.js")]]))
 
 (defroutes routes
