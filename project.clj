@@ -15,7 +15,6 @@
                  [prone "0.8.2" :scope "test"]
                  [compojure "1.4.0"]
                  [hiccup "1.0.5"]
-                 [json-html "0.2.8"]
                  ;; client
                  [org.clojure/clojurescript "1.7.107"]
                  [cljsjs/react "0.13.3-1"]
