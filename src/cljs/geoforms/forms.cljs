@@ -1,7 +1,7 @@
 (ns geoforms.forms
   (:require [reagent.core :as reagent :refer [atom]]
             [reagent-forms.core :refer [bind-fields init-field value-of]]
-            [geoforms.db :as db]))
+            [geoforms.db :as db :refer [snippet]]))
 
 ;;; state and logic
 
@@ -262,19 +262,21 @@
 
 (def form-template
   [:div
-   [:h3 "1. Choose your district"]
+   [:h3 (snippet :h-district)]
    [select-districts-component]
    [:hr]
 
-   [:h3 "2. Check ideas you want to support!"]
+   [:h3 (snippet :h-vote)]
    [:div.well
     [list-idea-blocks-component]]
    [:hr]
+
+   [:h3 (snippet :h-add)]
    [:div.well
     [add-idea-component]]
    [:hr]
 
-   [:h3 "3. Sign your choices"]
+   [:h3 (snippet :h-sign)]
    (signature-component)])
 
 

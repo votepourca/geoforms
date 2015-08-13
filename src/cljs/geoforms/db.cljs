@@ -69,6 +69,8 @@
 
 ;; constants
 
+(def language :en)
+
 (def age-groups
   [:17-
    :18-24
@@ -189,14 +191,23 @@
                            (doseq [v values]
                              (m/conj! ref v))))))
 
-;; (defonce app-cms
-;;   (atom
-;;    {:title                 "Support local ideas!"
-;;     :subtitle              ""
-;;     :instructions-district "1. Choose your district"
-;;     :instructions-vote     "2. Check ideas you want to support!"
-;;     :instructions-add      "3. Add your won ideas"
-;;     :instructions-sign     "4. Sign your choices"}))
+(def app-cms
+  (atom
+   {:en {:title      "Support local ideas!"
+         :subtitle   ""
+         :h-district "1. Choose your district"
+         :h-vote     "2. Check ideas you want to support!"
+         :h-add      "3. Add your won ideas"
+         :h-sign     "4. Sign your choices"}
+    :fr {:title      "Soutiennent les idées locales!"
+         :subtitle   ""
+         :h-district "1. Choisissez votre quartier"
+         :h-vote     "2. Vérifier les idées que vous voulez soutenir!"
+         :h-add     "3. Ajouter vos idées gagné"
+         :h-sign     "4. Connectez-vous à votre choix"}}))
+
+(defn snippet [key]
+  (get-in @app-cms [language key]))
 
 (load-fixtures!
  ideas-ref
