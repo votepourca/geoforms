@@ -15,6 +15,8 @@
                  [prone "0.8.2" :scope "test"]
                  [compojure "1.4.0"]
                  [hiccup "1.0.5"]
+                 ;; tasks
+                 [org.clojure/data.csv "0.1.2"]
                  ;; client
                  [org.clojure/clojurescript "1.7.107"]
                  [cljsjs/react "0.13.3-1"]
@@ -35,6 +37,8 @@
   :uberjar-name "geoforms.jar"
 
   :main geoforms.server
+
+  :aliases {"load" ["run" "-m" "geoforms.tasks"]}
 
   :clean-targets ^{:protect false} [:target-path
                                     [:cljsbuild :builds :app :compiler :output-dir]

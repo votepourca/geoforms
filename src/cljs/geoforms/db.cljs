@@ -52,7 +52,7 @@
 
 ;; refs
 
-(def ref (m/connect config/fb-uri [:community-app]))
+(def ref (m/connect config/fb-uri))
 
 (def ideas-ref (m/get-in ref [:ideas]))
 
@@ -205,7 +205,6 @@
 (defn create-user!
   [{:keys [email] :as user}
    ideas]
-  (prn user)
   (let [path [:users (munge- email)]]
     ;; upsert the user
     (m/swap-in! ref path
