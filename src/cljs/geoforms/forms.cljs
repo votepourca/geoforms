@@ -195,7 +195,7 @@
   [:button.btn.btn-sm.btn-default
    {:class   (if (selected-district? d) :active)
     :on-click #(toggle-district! d)}
-   [:span d  (str d " (" (@db/district-counts d) ") ")]])
+   [:span (str d " (" (@db/district-counts d) ") ")]])
 
 (defn select-districts-component []
   [:div.btn-group {:field :multi-select :id :every.position}

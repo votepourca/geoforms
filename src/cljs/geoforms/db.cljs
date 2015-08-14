@@ -232,7 +232,7 @@
          :h-district                  "Step 1. Choose your district"
          :h-vote                      "Step 2. Check ideas you want to support!"
          :h-add                       "Step 3. Add your own ideas"
-         :h-sign                      "Step 4. Sign your choices"
+         :h-sign                      "Last Step. Sign your choices"
          :person.alert-ideas?         "I want to get noticed about my supported ideas progress."
          :person.alert-volunteer?     "I want to get noticed about volonteer opportunities regarding ideas I voted for."
          :person.alert-districts?     "I want to get noticed about major updates in my supported district(s)."
@@ -267,7 +267,7 @@
          :h-district                  "Étape 1. Choisissez votre quartier (ou vos quartiers)"
          :h-vote                      "Étape 2. Cochez les idées que vous souhaitez appuyer!"
          :h-add                       "Étape 3. Ajoutez vos idées"
-         :h-sign                      "Étape 4. Signez vos choix"
+         :h-sign                      "Étape finale. Signez vos choix"
          :person.alert-ideas?         "Je veux être tenu au courant de la progression des idées que j'ai appuyées."
          :person.alert-volunteer?     "Je veux être informé des opportunités de bénévolat entourant les idées que j'ai appuyées."
          :person.alert-districts?     "Je veux être informé de développements majeurs sur les activités de Votepour.ca dans mon quartier."
@@ -296,7 +296,7 @@
          :no                          "Non"
          :new-ideas-saved-once-signed "Votre idée ou vos idées seront sauvegardées dès que vous signerez et enverrez vos choix (voir le bas du formulaire)"
          :completed-title             "Merci!"
-         :completed-message           "Vos choix ont été soumis. Si vous avez ajouté des idées, il devrait être désormais public."}}))
+         :completed-message           "Vos choix ont bien été envoyés. Si vous avez ajouté des idées, elles devraient être désormais publiques."}}))
 
 (defn snippet [key]
   (get-in @app-cms [@language key]))
