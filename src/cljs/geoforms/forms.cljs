@@ -225,7 +225,7 @@
       [:label [:input {:type :checkbox :id id}]
        [:span {:style {:color (if pending? :green)}} title]]])
    (when (not= d @db/selected-district)
-     [:a.btn.btn-xs.btn-success
+     [:a.btn.btn-sm.btn-success
       {:on-click #(reset! db/selected-district d)}
       (str (snippet :add-idea-to) " " d)])])
 
@@ -322,6 +322,7 @@
 (defn step-2 []
   [:div
    [:h3 (snippet :h-vote)]
+   [:p (snippet :h-vote-p)]
    [:div.well
     [list-idea-blocks-component]]
    [:hr]])
@@ -376,6 +377,6 @@
                        errors (validate-user after)]
                    (assoc after :errors errors)))]
 
-           [:button.btn.btn-primary
+           [:button.btn.btn-primary.btn-lg
             {:on-click #(when (validate-user! user-form) (submit! @user-form))}
             (snippet :submit)]]))])])

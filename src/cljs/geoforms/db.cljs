@@ -68,7 +68,7 @@
 
 ;; constants
 
-(def language (atom :en))
+(def language (atom :fr))
 
 (def age-groups
   [:17-
@@ -229,10 +229,11 @@
   (atom
    {:en {:page-title                  "Support local ideas!"
          :page-subtitle               ""
-         :h-district                  "Step 1. Choose your district"
-         :h-vote                      "Step 2. Check ideas you want to support!"
-         :h-add                       "Step 3. Add your own ideas"
-         :h-sign                      "Last Step. Sign your choices"
+         :h-district                  "Step 1: Choose your district"
+         :h-vote                      "Step 2: Check ideas you want to support!"
+         :h-vote-p                    "These ideas has been submitted by citizens like you!"
+         :h-add                       "Step 3: Add your own ideas"
+         :h-sign                      "Last Step: Sign your choices"
          :person.alert-ideas?         "I want to get noticed about my supported ideas progress."
          :person.alert-volunteer?     "I want to get noticed about volonteer opportunities regarding ideas I voted for."
          :person.alert-districts?     "I want to get noticed about major updates in my supported district(s)."
@@ -264,10 +265,11 @@
          :completed-message           "Your choices have been submitted. If you've added ideas, it should be now public."}
     :fr {:page-title                  "Appuyez et suggérez des idées pour votre quartier!"
          :page-subtitle               ""
-         :h-district                  "Étape 1. Choisissez votre quartier (ou vos quartiers)"
-         :h-vote                      "Étape 2. Cochez les idées que vous souhaitez appuyer!"
-         :h-add                       "Étape 3. Ajoutez vos idées"
-         :h-sign                      "Étape finale. Signez vos choix"
+         :h-district                  "Étape 1: Choisissez votre quartier (ou vos quartiers)"
+         :h-vote                      "Étape 2: Cochez les idées que vous souhaitez appuyer!"
+         :h-vote-p                  "Ces idées ont été proposées par des citoyens participants comme vous!"
+         :h-add                       "Étape 3: Ajoutez vos idées"
+         :h-sign                      "Étape finale: Signez vos choix"
          :person.alert-ideas?         "Je veux être tenu au courant de la progression des idées que j'ai appuyées."
          :person.alert-volunteer?     "Je veux être informé des opportunités de bénévolat entourant les idées que j'ai appuyées."
          :person.alert-districts?     "Je veux être informé de développements majeurs sur les activités de Votepour.ca dans mon quartier."
