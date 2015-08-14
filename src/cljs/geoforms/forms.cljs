@@ -12,7 +12,8 @@
     :added-ideas        nil
     :added-user         nil
     :completed?         false
-    :pending-ideas      []}))
+    :pending-ideas      []
+    :show-idea-confirm? false}))
 
 (def user-defaults
   {:person {:alert-ideas?     true
@@ -66,6 +67,12 @@
 
 (defn queue-idea! [idea]
   (swap! app-state update :pending-ideas #(conj % idea)))
+
+(defn confirm-idea-msg! [_]
+  (swap! app-state assoc :show-confirm-idea? true)
+  (js/setTimeout
+   #(swap! app-state assoc :show-confirm-idea? false)
+   5000))
 
 (defn submit-ideas! []
   (loop []
@@ -261,9 +268,9 @@
     (idea-template)
     idea-form
     #_ (fn [k v _] (prn k v _))]
-   [:button.btn.btn-default
+   [:button.btn.btn-primary
     {:on-click #(when (validate-idea! idea-form)
-                  (-> @idea-form normalize-idea queue-idea!))}
+                  (-> @idea-form normalize-idea queue-idea! confirm-idea-msg!))}
     (snippet :add-idea)]])
 
 (defn signature-component []
@@ -323,7 +330,16 @@
   [:div
    [:h3 (snippet :h-add)]
    [:div.well
-    [add-idea-component]]
+    [add-idea-component]
+    [:alert]
+    (when (:show-confirm-idea? @app-state)
+      [:div [:br]
+       [:div.row
+        [:div.col-md-1]
+        [:div.col-md-10
+         [:div.alert.alert-success
+          {:field :alert, :style {:margin-bottom 0}}
+          [:div (snippet :new-ideas-saved-once-signed)]]]]])]
    [:hr]])
 
 (defn step-4 []
