@@ -7,24 +7,23 @@
 
 (defonce app-state
   (atom
-   {:selected-districts #{}
+   {:selected-districts '()
     :added-ideas nil
     :added-user  nil}))
 
 (defn toggle-district! [d]
   (swap! app-state update :selected-districts
-         #(do (when (and (= d @db/selected-district) (% d))
-                (reset! db/selected-district nil))
-              (if (% d) (disj % d) (conj % d)))))
+         #(let [match? (fn [x] (= d x))
+                on?    (some match? %)]
+            (when (and on? (match? @db/selected-district))
+              (reset! db/selected-district nil))
+            (if on? (remove match? %) (conj % d)))))
 
 (defn selected-districts []
   (:selected-districts @app-state))
 
 (defn selected-district? [d]
-  (contains? (selected-districts) d))
-
-(defn district-ideas [d]
-  (filter (comp #(some #{d} %) :districts) @db/ideas))
+  (some #(= d %) (selected-districts)))
 
 (def email-regex #"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$")
 
@@ -61,7 +60,7 @@
 
     (when-let [title (:title idea)]
       (and (seq title)
-           (some (comp #{title} :title) (district-ideas @db/selected-district))))
+           (some (comp #{title} :title) (@db/district-ideas @db/selected-district))))
     (assoc :title (str (snippet :title) " " (snippet :already-used)))
 
     (empty? (:category idea))
@@ -149,11 +148,11 @@
   [:button.btn.btn-sm.btn-default
    {:class   (if (selected-district? d) :active)
     :on-click #(toggle-district! d)}
-   d])
+   [:span d  (str d " (" (@db/district-counts d) ") ")]])
 
 (defn select-districts-component []
   [:div.btn-group {:field :multi-select :id :every.position}
-   (for [d @db/districts]
+   (for [d @db/districts-by-count]
      ^{:key d}
      [district-toggle d])])
 
@@ -171,7 +170,7 @@
 
 (defn district-ideas-component [d ideas]
   [:div {:key d}
-   [:p [:strong (str d " (" (count ideas) ") ")]]
+   [:p [:strong d]]
    (for [{:keys [id title]} ideas]
      [:div.checkbox {:key id
                      :on-change #(let [supported? (-> % .-target .-checked)]
@@ -189,11 +188,9 @@
      (interpose
       [:br]
       (map second
-           (sort
-            (for [d     districts
-                  :when (selected-district? d)
-                  :let  [ideas (district-ideas d)]]
-              [(- (count ideas)) [district-ideas-component d ideas]])))))))
+           (for [d     (selected-districts)
+                 :let  [ideas (@db/district-ideas d)]]
+             [(- (count ideas)) [district-ideas-component d ideas]]))))))
 
 (defn idea-template []
   [:div

@@ -126,6 +126,19 @@
          "Vieux-Limoilou"
          "Autre"]))
 
+(def district-ideas
+  (reaction (let [ds @districts
+                  is @ideas
+                  f (fn [d] (filter (comp #(some #{d} %) :districts) is))]
+              (zipmap ds (map f ds)))))
+
+(def district-counts
+  (reaction (let [di @district-ideas]
+              (zipmap (keys di) (map count (vals di))))))
+
+(def districts-by-count
+  (reaction (mapv first (sort-by (comp - last) @district-counts))))
+
 (def supported-ideas (atom #{}))
 
 (defonce selected-district (atom nil))
