@@ -209,11 +209,12 @@
 (defn district-ideas-component [d ideas]
   [:div {:key d}
    [:p [:strong d]]
-   (for [{:keys [id title]} ideas]
+   (for [{:keys [id title pending?]} ideas]
      [:div.checkbox {:key id
                      :on-change #(let [supported? (-> % .-target .-checked)]
                                    (db/set-idea-support! id supported?))}
-      [:label [:input {:type :checkbox :id id}] title]])
+      [:label [:input {:type :checkbox :id id}]
+       [:span {:style {:color (if pending? :green)}} title]]])
    (when (not= d @db/selected-district)
      [:a.btn.btn-xs.btn-success
       {:on-click #(reset! db/selected-district d)}
