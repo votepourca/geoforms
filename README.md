@@ -1,5 +1,18 @@
 # geoforms
-Reagent app for local democracy tools
+Local Democracy Forms and Tools based on ClojureScript Reagent (react.js) and Matchbox (firebase) app for local democracy
+
+This is Alpha software.
+
+
+## What's inside
+
+This is mainly a ClojureScript application that includes:
+* [Reagent](https://github.com/reagent-project/reagent) - ClojureScript interface to Facebook's React
+* [reagent-forms](https://github.com/reagent-project/reagent-forms) - data binding library for Reagent
+* [Matchbox](https://github.com/crisptrutski/matchbox) - a Firebase client for Clojure(Script)
+
+It also has a clojure backend for now (but might be removed) and Heroku facilities for deployment.
+
 
 ## Usage
 
@@ -24,45 +37,12 @@ If you're only doing client-side development then it's sufficient to simply run 
 Figwheel compiler and then browse to [http://localhost:3449](http://localhost:3449)
 once it starts up.
 
-#### Optional development tools
 
-Start the browser REPL:
+## Contributors
 
-```
-$ lein repl
-```
-The Jetty server can be started by running:
+Many thanks to Chris Truter (crisptrutski) for his contribution.
 
-```clojure
-(start-server)
-```
-and stopped by running:
-```clojure
-(stop-server)
-```
 
-### Building for release
-
-```
-lein cljsbuild clean
-lein uberjar
-```
-
-## Contents
-
-The template packages everything you need to create a production ready ClojureScript application following current best practices. The template uses the following features and libraries:
-
-* [Reagent](https://github.com/reagent-project/reagent) - ClojureScript interface to Facebook's React
-* [reagent-forms](https://github.com/reagent-project/reagent-forms) - data binding library for Reagent
-* [reagent-utils](https://github.com/reagent-project/reagent-utils) - utilities such as session and cookie management
-* [Secretary](https://github.com/gf3/secretary) - client-side routing
-* [Hiccup](https://github.com/weavejester/hiccup) - server-side HTML templating
-* [Compojure](https://github.com/weavejester/compojure) - a popular routing library
-* [Ring](https://github.com/ring-clojure/ring) - Clojure HTTP interface
-* [Prone](https://github.com/magnars/prone) - better exception reporting middleware for Ring
-* [Heroku](https://www.heroku.com/) - the template is setup to work on Heroku out of the box, simply run `git push heroku master`
-* [clojurescript.test](https://github.com/cemerick/clojurescript.test) - a maximal port of clojure.test to ClojureScript
- 
 ## License
 
 Copyright © 2015 Votepour.ca and Leon Talbot
