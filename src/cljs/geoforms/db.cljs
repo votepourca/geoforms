@@ -112,19 +112,34 @@
 (def categories (reaction (get @category-translations @language)))
 
 (def districts
-  (atom ["Beauport"
+  (atom ["Ancienne-Lorette"
+         "Beauport"
+         "Cap-Rouge"
          "Charlesbourg"
+         "Duberger-Les-Saules"
+         "Lac-Beauport"
+         "Lac-Saint-Charles"
          "Lairet"
+         "Lebourgneuf"
+         "Loretteville"
          "Maizerets"
          "Méandres"
          "Montcalm"
+         "Neufchâtel"
+         "Saint-Augustin"
+         "Saint-Émile"
          "Saint-Jean-Baptiste"
          "Saint-Roch"
          "Saint-Sauveur"
          "Sainte-Foy"
          "Sillery"
+         "Stoneham"
+         "Val-Bélair"
+         "Vanier"
          "Vieux-Limoilou"
+         "Vieux-Québec"
          "Autre"]))
+
 
 (def district-ideas
   (reaction (let [ds @districts
