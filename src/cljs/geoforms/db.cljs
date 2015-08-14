@@ -217,11 +217,14 @@
   [{:keys [email] :as user}
    ideas]
   (let [path [:users (munge- email)]]
-    ;; upsert the user
-    (m/reset-in! ref path (assoc user :created-at m/SERVER_TIMESTAMP))
-    ;; upsert the supported ideas
-    (set-user-ideas email ideas)))
-
+    (m/deref-in
+     ref (conj path :supports)
+     (fn [existing-ideas]
+       (let [ideas (into ideas (keys existing-ideas))]
+         ;; upsert the user
+         (m/reset-in! ref path (assoc user :created-at m/SERVER_TIMESTAMP))
+         ;; upsert the supported ideas
+         (set-user-ideas email ideas))))))
 
 ;; translations
 
