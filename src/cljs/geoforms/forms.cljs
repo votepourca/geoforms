@@ -75,10 +75,12 @@
    #(swap! app-state assoc :show-confirm-idea? false)
    5000))
 
-(defn submit-ideas! []
+(defn submit-ideas! [user-email]
   (loop []
     (when-let [idea (dequeue-in! app-state [:pending-ideas])]
-      (submit-idea! idea)
+      (let [idea-id (submit-idea! idea)]
+        (prn idea-id)
+        (db/set-user-idea user-email idea-id true))
       (recur))))
 
 (defn district-ideas [district]
@@ -148,7 +150,7 @@
   "Ensure the signing user exists and their support is noted."
   [doc]
   (db/create-user! (:person doc) @db/supported-ideas)
-  (submit-ideas!)
+  (submit-ideas! (get-in doc [:person :email]))
   (complete!))
 
 (defn normalize-idea [idea]
@@ -223,7 +225,7 @@
      [:div.checkbox {:key id
                      :on-change #(let [supported? (-> % .-target .-checked)]
                                    (db/set-idea-support! id supported?))}
-      [:label [:input {:type :checkbox :id id}]
+      [:label [:input {:type :checkbox :id id :checked pending?}]
        [:span {:style {:color (if pending? :green)}} title]]])
    (when (not= d @db/selected-district)
      [:a.btn.btn-sm.btn-success

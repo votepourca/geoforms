@@ -207,11 +207,12 @@
     (swap! supported-ideas (if supported? conj disj) id)))
 
 (defn create-idea! [{:keys [title desc category districts] :as idea}]
-  (m/conj-in! ref [:ideas]
-              {:title     title
-               :desc      desc
-               :category  category
-               :districts districts}))
+  (m/key
+   (m/conj-in! ref [:ideas]
+               {:title     title
+                :desc      desc
+                :category  category
+                :districts districts})))
 
 (defn create-user!
   [{:keys [email] :as user}
