@@ -128,7 +128,7 @@
 
 (def supported-ideas (atom #{}))
 
-(def selected-district (atom nil))
+(defonce selected-district (atom nil))
 
 (defn logout! []
   (ma/unlink! supported-ideas)
