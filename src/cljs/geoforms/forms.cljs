@@ -69,15 +69,18 @@
   (swap! app-state update :pending-ideas #(conj % idea)))
 
 (defn confirm-idea-msg! [_]
+  (reset! db/selected-district nil)
   (swap! app-state assoc :show-confirm-idea? true)
   (js/setTimeout
    #(swap! app-state assoc :show-confirm-idea? false)
    5000))
 
-(defn submit-ideas! []
+(defn submit-ideas! [user-email]
   (loop []
     (when-let [idea (dequeue-in! app-state [:pending-ideas])]
-      (submit-idea! idea)
+      (let [idea-id (submit-idea! idea)]
+        (prn idea-id)
+        (db/set-user-idea user-email idea-id true))
       (recur))))
 
 (defn district-ideas [district]
@@ -147,7 +150,7 @@
   "Ensure the signing user exists and their support is noted."
   [doc]
   (db/create-user! (:person doc) @db/supported-ideas)
-  (submit-ideas!)
+  (submit-ideas! (get-in doc [:person :email]))
   (complete!))
 
 (defn normalize-idea [idea]
@@ -222,7 +225,7 @@
      [:div.checkbox {:key id
                      :on-change #(let [supported? (-> % .-target .-checked)]
                                    (db/set-idea-support! id supported?))}
-      [:label [:input {:type :checkbox :id id}]
+      [:label [:input {:type :checkbox :id id :checked pending?}]
        [:span {:style {:color (if pending? :green)}} title]]])
    (when (not= d @db/selected-district)
      [:a.btn.btn-sm.btn-success
@@ -266,8 +269,7 @@
     [:input.form-control {:disabled true, :value @db/selected-district}]]
    [bind-fields
     (idea-template)
-    idea-form
-    #_ (fn [k v _] (prn k v _))]
+    idea-form]
    [:button.btn.btn-primary
     {:on-click #(when (validate-idea! idea-form)
                   (-> @idea-form normalize-idea queue-idea! confirm-idea-msg!))}
@@ -332,15 +334,7 @@
    [:h3 (snippet :h-add)]
    [:div.well
     [add-idea-component]
-    [:alert]
-    (when (:show-confirm-idea? @app-state)
-      [:div [:br]
-       [:div.row
-        [:div.col-md-1]
-        [:div.col-md-10
-         [:div.alert.alert-success
-          {:field :alert, :style {:margin-bottom 0}}
-          [:div (snippet :new-ideas-saved-once-signed)]]]]])]
+    [:alert]]
    [:hr]])
 
 (defn step-4 []
@@ -369,6 +363,14 @@
            [step-2]
            (when @db/selected-district
              [step-3])
+           (when (:show-confirm-idea? @app-state)
+             [:div.well
+              [:div.row
+               [:div.col-md-1]
+               [:div.col-md-10
+                [:div.alert.alert-success
+                 {:field :alert, :style {:margin-bottom 0}}
+                 [:div (snippet :new-ideas-saved-once-signed)]]]]])
            [bind-fields
             (step-4)
             user-form
