@@ -8,10 +8,41 @@
 (defonce app-state
   (atom
    {:selected-districts '()
-    :added-ideas nil
-    :added-user  nil}))
+    :added-ideas        nil
+    :added-user         nil
+    :completed?         false}))
+
+(def user-defaults
+  {:person {:alert-ideas?     true
+            :alert-volunteer? true
+            :alert-districts? true}})
+
+(def idea-defaults
+  {:title     nil
+   :desc      nil
+   :districts nil
+   :category  nil
+   :links     nil})
+
+(defonce user-form
+  (atom user-defaults))
+
+(defonce idea-form
+  (atom idea-defaults))
+
+(defn completed? []
+  (:completed? @app-state))
+
+(defn complete! []
+  (reset! user-form user-defaults)
+  (reset! idea-form idea-defaults)
+  (swap! app-state assoc :completed? true))
+
+(defn restart! []
+  (swap! app-state assoc :completed? false))
 
 (defn toggle-district! [d]
+  (restart!)
   (swap! app-state update :selected-districts
          #(let [match? (fn [x] (= d x))
                 on?    (some match? %)]
@@ -53,8 +84,6 @@
   "Build map of {key error} pairs, where each {error} relates to idea.{key}"
   [idea]
   (cond-> {}
-    ;; TODO: user has signed
-
     (empty? (:title idea))
     (assoc :title (str (snippet :title) " " (snippet :required)))
 
@@ -83,7 +112,8 @@
 (defn submit!
   "Ensure the signing user exists and their support is noted."
   [doc]
-  (db/create-user! (:person doc) @db/supported-ideas))
+  (db/create-user! (:person doc) @db/supported-ideas)
+  (complete!))
 
 (defn normalize-idea [idea]
   (-> idea
@@ -94,19 +124,6 @@
   [doc]
   (db/create-idea! doc))
 
-;; forms
-
-(defonce user-doc
-  (atom {:person {:alert-ideas?     true
-                  :alert-volunteer? true
-                  :alert-districts? true}}))
-
-(defonce idea-doc
-  (atom {:title     nil
-         :desc      nil
-         :districts nil
-         :category  nil
-         :links     nil}))
 
 ;;; view helpers
 
@@ -159,8 +176,8 @@
 (defn select-cat-component []
   [:div.form-group
    [:select.form-control
-    {:value (get-in @idea-doc [:category])
-     :on-change #(swap! idea-doc assoc-in [:category]
+    {:value (get-in @idea-form [:category])
+     :on-change #(swap! idea-form assoc-in [:category]
                         (-> % .-target .-value))}
     [:option
      {:value "", :disabled true, :selected true}
@@ -218,11 +235,11 @@
     [:input.form-control {:disabled true, :value @db/selected-district}]]
    [bind-fields
     (idea-template)
-    idea-doc
+    idea-form
     #_ (fn [k v _] (prn k v _))]
    [:button.btn.btn-default
-    {:on-click #(when (validate-idea! idea-doc)
-                  (-> @idea-doc normalize-idea submit-idea!))}
+    {:on-click #(when (validate-idea! idea-form)
+                  (-> @idea-form normalize-idea submit-idea!))}
     (snippet :add-idea)]])
 
 (defn signature-component []
@@ -305,18 +322,20 @@
      [:div
       [step-1]
       (when (seq (selected-districts))
-        [:div
-         [step-2]
-         (when @db/selected-district
-           [step-3])
-         [bind-fields
-          (step-4)
-          user-doc
-          #_ (fn [k v _]
-               (let [after (assoc-in @user-doc k v)
-                     errors (validate-user after)]
-                 (assoc after :errors errors)))]
+        (if (completed?)
+          [completed-view]
+          [:div
+           [step-2]
+           (when @db/selected-district
+             [step-3])
+           [bind-fields
+            (step-4)
+            user-form
+            #_ (fn [k v _]
+                 (let [after (assoc-in @user-form k v)
+                       errors (validate-user after)]
+                   (assoc after :errors errors)))]
 
-         [:button.btn.btn-primary
-          {:on-click #(when (validate-user! user-doc) (submit! @user-doc))}
-          (snippet :submit)]])])])
+           [:button.btn.btn-primary
+            {:on-click #(when (validate-user! user-form) (submit! @user-form))}
+            (snippet :submit)]]))])])
