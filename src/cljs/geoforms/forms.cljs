@@ -1,7 +1,8 @@
 (ns geoforms.forms
   (:require [reagent.core :as reagent :refer [atom]]
             [reagent-forms.core :refer [bind-fields init-field value-of]]
-            [geoforms.db :as db :refer [snippet]]))
+            [geoforms.db :as db :refer [snippet]]
+            [geoforms.utils :refer [dequeue-in! valid-email?]]))
 
 ;;; state and logic
 
@@ -10,7 +11,8 @@
    {:selected-districts '()
     :added-ideas        nil
     :added-user         nil
-    :completed?         false}))
+    :completed?         false
+    :pending-ideas      []}))
 
 (def user-defaults
   {:person {:alert-ideas?     true
@@ -56,7 +58,32 @@
 (defn selected-district? [d]
   (some #(= d %) (selected-districts)))
 
-(def email-regex #"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$")
+(defn submit-idea!
+  [doc]
+  (db/create-idea! doc))
+
+(defn queue-idea! [idea]
+  (swap! app-state update :pending-ideas #(conj % idea)))
+
+(defn submit-ideas! []
+  (loop []
+    (when-let [idea (dequeue-in! app-state [:pending-ideas])]
+      (submit-idea! idea)
+      (recur))))
+
+(defn district-ideas [district]
+  (let [saved   (@db/district-ideas district)
+        pending (map-indexed
+                 (fn [i idea] (assoc idea :pending? true :id (str "pending-" i)))
+                 (filter (fn [{:keys [districts]}]
+                           (some #(= district %) districts))
+                         (:pending-ideas @app-state)))]
+    (if (seq pending)
+      (vec (concat saved pending))
+      saved)))
+
+(defn title-unique? [title district]
+  (some (comp #{title} :title) (district-ideas district)))
 
 (defn validate-user
   "Build map of {key error} pairs, where each {error} relates to persion.{key}"
@@ -73,8 +100,7 @@
       (assoc :email (str (snippet :email) " " (snippet :required)))
 
       (when-let [email (:email person)]
-        (and (seq email)
-             (nil? (re-find email-regex email))))
+        (and (seq email) (valid-email? email)))
       (assoc :email (str (snippet :email) " " (snippet :not-valid)))
 
       (nil? (:age person))
@@ -88,8 +114,7 @@
     (assoc :title (str (snippet :title) " " (snippet :required)))
 
     (when-let [title (:title idea)]
-      (and (seq title)
-           (some (comp #{title} :title) (@db/district-ideas @db/selected-district))))
+      (and (seq title) (title-unique? title @db/selected-district)))
     (assoc :title (str (snippet :title) " " (snippet :already-used)))
 
     (empty? (:category idea))
@@ -113,17 +138,13 @@
   "Ensure the signing user exists and their support is noted."
   [doc]
   (db/create-user! (:person doc) @db/supported-ideas)
+  (submit-ideas!)
   (complete!))
 
 (defn normalize-idea [idea]
   (-> idea
       (update :urls #(into [] (vals (apply sorted-set %))))
       (assoc :districts [@db/selected-district])))
-
-(defn submit-idea!
-  [doc]
-  (db/create-idea! doc))
-
 
 ;;; view helpers
 
@@ -206,7 +227,7 @@
       [:br]
       (map second
            (for [d     (selected-districts)
-                 :let  [ideas (@db/district-ideas d)]]
+                 :let  [ideas (district-ideas d)]]
              [(- (count ideas)) [district-ideas-component d ideas]]))))))
 
 (defn idea-template []
@@ -239,7 +260,7 @@
     #_ (fn [k v _] (prn k v _))]
    [:button.btn.btn-default
     {:on-click #(when (validate-idea! idea-form)
-                  (-> @idea-form normalize-idea submit-idea!))}
+                  (-> @idea-form normalize-idea queue-idea!))}
     (snippet :add-idea)]])
 
 (defn signature-component []
