@@ -361,9 +361,9 @@
               (seq @db/ideas))
      [:div
       [step-1]
-      (when (seq (selected-districts))
-        (if (completed?)
-          [completed-view]
+      (if (completed?)
+        [completed-view]
+        (when (seq (selected-districts))
           [:div
            [step-2]
            (when @db/selected-district
