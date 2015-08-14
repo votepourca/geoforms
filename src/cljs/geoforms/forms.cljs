@@ -146,11 +146,10 @@
 
 (defn district-toggle [d]
   ^{:key d}
-  [:button.btn.btn-default
-   {:active   (selected-district? d)
+  [:button.btn.btn-sm.btn-default
+   {:class   (if (selected-district? d) :active)
     :on-click #(toggle-district! d)}
-   [(if (selected-district? d) :b :span)
-    d]])
+   d])
 
 (defn select-districts-component []
   [:div.btn-group {:field :multi-select :id :every.position}
