@@ -37,7 +37,11 @@ If you're only doing client-side development then it's sufficient to simply run 
 Figwheel compiler and then browse to [http://localhost:3449](http://localhost:3449)
 once it starts up.
 
+### Static deployment (to javascript)
 
+```
+lein with-profile uberjar cljsbuild once
+```
 ## Contributors
 
 Many thanks to Chris Truter (crisptrutski) for his contribution.
