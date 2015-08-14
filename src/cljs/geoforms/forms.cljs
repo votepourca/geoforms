@@ -2,7 +2,7 @@
   (:require [reagent.core :as reagent :refer [atom]]
             [reagent-forms.core :refer [bind-fields init-field value-of]]
             [geoforms.db :as db :refer [snippet]]
-            [geoforms.utils :refer [dequeue-in! valid-email?]]))
+            [geoforms.utils :refer [dequeue-in! valid-email? valid-zip-code?]]))
 
 ;;; state and logic
 
@@ -114,6 +114,13 @@
       (when-let [email (:email person)]
         (and (seq email) (valid-email? email)))
       (assoc :email (str (snippet :email) " " (snippet :not-valid)))
+
+      (empty? (:zip-code person))
+      (assoc :zip-code (str (snippet :zip-code) " " (snippet :required)))
+
+      (when-let [zip-code (:zip-code person)]
+        (and (seq zip-code) (valid-zip-code? zip-code)))
+      (assoc :zip-code (str (snippet :zip-code) " " (snippet :not-valid)))
 
       (nil? (:age person))
       (assoc :age (str (snippet :age) " " (snippet :not-set))))))
@@ -285,6 +292,9 @@
 
    (input (snippet :email) :email :person.email)
    (error-field :email)
+
+   (input (snippet :zip-code) :text :person.zip-code)
+   (error-field :zip-code)
 
    [:div.form-group
     (row (snippet :age)
