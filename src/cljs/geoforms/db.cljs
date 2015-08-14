@@ -205,9 +205,7 @@
    ideas]
   (let [path [:users (munge- email)]]
     ;; upsert the user
-    (m/swap-in! ref path
-                (fn [{:keys [created-at] :as existing}]
-                  (assoc user :created-at (or created-at m/SERVER_TIMESTAMP))))
+    (m/reset-in! ref path (assoc user :created-at m/SERVER_TIMESTAMP))
     ;; upsert the supported ideas
     (set-user-ideas email ideas)))
 
