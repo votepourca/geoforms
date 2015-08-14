@@ -56,8 +56,6 @@
 
 (def ideas-ref (m/get-in ref [:ideas]))
 
-(def users-ref (m/get-in ref [:users]))
-
 (def categories-ref (m/get-in ref [:categories]))
 
 (def districts-ref (m/get-in ref [:districts]))
@@ -292,44 +290,8 @@
 (defn snippet [key]
   (get-in @app-cms [@language key]))
 
-;; fixtures
 
-(defn load-fixtures! [ref values]
-  (m/deref ref (fn [data] (when-not (seq data)
-                           (doseq [v values]
-                             (m/conj! ref v))))))
-
-;; (load-fixtures!
-;;  ideas-ref
-;;  [{:created-at "2013-08-10 11:20:22"
-;;    :districts  ["Brooklyn"]
-;;    :title      "New skatepark"
-;;    :desc       "Would be really nice to have a new skatepark"
-;;    :links      ["http://lapresse.ca/article-2"]
-;;    :supporters (->set-map ["email@email.com" "email2@email.com" "john@hotmail.com"])
-;;    :supporters (->set-map [])
-;;    :category   "Other..."}])
-
-;; (load-fixtures!
-;;  users-ref
-;;  [{:created-at       "2013-08-10 11:20:22"
-;;    :fullname         "Leon Talbot"
-;;    :email            "email@email.com"
-;;    :zip-code         "G21 2C5"
-;;    :age              "32"
-;;    :annual-revenue   ""
-;;    :alert-ideas?     true
-;;    :alert-volunteer? false
-;;    :alert-districts? true
-;;    :comments         ""}])
-
-;(load-fixtures!
- ;categories-ref
- ;["Shops" "Security" "Green" "Other..."])
-
-;(load-fixtures!
- ;districts-ref
- ;["Manhattan" "Brooklyn" "Queens" "Other districts"])
+;; auth
 
 (defn init-session []
   ;; TODO: to be more robust, should really handle failures here,
