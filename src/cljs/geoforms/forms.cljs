@@ -69,6 +69,7 @@
   (swap! app-state update :pending-ideas #(conj % idea)))
 
 (defn confirm-idea-msg! [_]
+  (reset! db/selected-district nil)
   (swap! app-state assoc :show-confirm-idea? true)
   (js/setTimeout
    #(swap! app-state assoc :show-confirm-idea? false)
@@ -266,8 +267,7 @@
     [:input.form-control {:disabled true, :value @db/selected-district}]]
    [bind-fields
     (idea-template)
-    idea-form
-    #_ (fn [k v _] (prn k v _))]
+    idea-form]
    [:button.btn.btn-primary
     {:on-click #(when (validate-idea! idea-form)
                   (-> @idea-form normalize-idea queue-idea! confirm-idea-msg!))}
@@ -332,15 +332,7 @@
    [:h3 (snippet :h-add)]
    [:div.well
     [add-idea-component]
-    [:alert]
-    (when (:show-confirm-idea? @app-state)
-      [:div [:br]
-       [:div.row
-        [:div.col-md-1]
-        [:div.col-md-10
-         [:div.alert.alert-success
-          {:field :alert, :style {:margin-bottom 0}}
-          [:div (snippet :new-ideas-saved-once-signed)]]]]])]
+    [:alert]]
    [:hr]])
 
 (defn step-4 []
@@ -369,6 +361,14 @@
            [step-2]
            (when @db/selected-district
              [step-3])
+           (when (:show-confirm-idea? @app-state)
+             [:div.well
+              [:div.row
+               [:div.col-md-1]
+               [:div.col-md-10
+                [:div.alert.alert-success
+                 {:field :alert, :style {:margin-bottom 0}}
+                 [:div (snippet :new-ideas-saved-once-signed)]]]]])
            [bind-fields
             (step-4)
             user-form
