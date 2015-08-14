@@ -23,6 +23,11 @@
             s
             mungings)))
 
+(defn ->set-map
+  "Convert a set into a map of {element true}"
+  [set]
+  (zipmap (map munge- set) (repeat true)))
+
 (def ref (m/connect "https://geoforms.firebaseio.com/community-app"))
 
 ;; upsert
@@ -47,7 +52,7 @@
 (def header-lookup
   {;; idea
    "Timestamp"       :created-at
-   "Quartier"        :district
+   "Quartier"        :districts
    "Idee"            :title
    "Categorie"       :category
    "Desc"            :desc
@@ -85,7 +90,8 @@
            (map #(zipmap headers %))
            ;; idea?
            (map #(update % :urls split-list))
-           (map #(update % :supporters split-list))
+           (map #(update % :supporters (comp ->set-map split-list)))
+           (map #(update % :districts split-list))
            ;; user?
            (map #(update % :age parse-age))
            (map #(update % :alert-districts? parse-bool))
