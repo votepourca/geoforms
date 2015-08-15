@@ -303,7 +303,7 @@
          :add-idea                    "Ajoutez votre idée"
          :optional                    "(facultatif)"
          :idea-title                  "Titre de l'idée"
-         :add-idea-to                 "Ajoutez une idée à"
+         :add-idea-to                 "Ajoutez une idée pour"
          :idea                        "idée"
          :select-category             "Choisissez une catégorie"
          :add-url                     "Ajoutez une URL de reférence"
