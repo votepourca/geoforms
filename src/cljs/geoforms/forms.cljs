@@ -39,6 +39,7 @@
 (defn complete! []
   (reset! user-form user-defaults)
   (reset! idea-form idea-defaults)
+  (reset! db/supported-ideas #{})
   (swap! app-state assoc
          :completed? true
          :selected-districts '()))
