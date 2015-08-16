@@ -40,7 +40,7 @@ once it starts up.
 ### Static deployment (to javascript)
 
 ```
-lein with-profile uberjar cljsbuild once
+FB_BASE="https://<your-app>.firebaseio.com/" lein with-profile prod cljsbuild once
 ```
 ## Contributors
 

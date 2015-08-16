@@ -3,7 +3,8 @@
   (:require [matchbox.core :as m]
             [clojure.string :as str]
             [clojure.data.csv :as csv]
-            [clojure.java.io :refer [reader]])
+            [clojure.java.io :refer [reader]]
+            [geoforms.config :as config])
   (:gen-class))
 
 ;; "db.cljc"
@@ -28,7 +29,7 @@
   [set]
   (zipmap (map munge- set) (repeat true)))
 
-(def ref (m/connect "https://geoforms.firebaseio.com/community-app"))
+(def ref (m/connect config/fb-uri))
 
 ;; upsert
 (defn create-user! [{:keys [email] :as user} cb]
