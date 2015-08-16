@@ -1,12 +1,13 @@
 (ns geoforms.core
-    (:require [reagent.core :as reagent :refer [atom]]
-              [reagent.session :as session]
-              [secretary.core :as secretary :include-macros true]
-              [goog.events :as events]
-              [goog.history.EventType :as EventType]
-              [geoforms.forms]
-              [geoforms.db :refer [snippet] :as db])
-    (:import goog.History))
+  (:require [reagent.core :as reagent :refer [atom]]
+            [reagent.session :as session]
+            [secretary.core :as secretary :include-macros true]
+            [goog.events :as events]
+            [goog.history.EventType :as EventType]
+            [geoforms.forms]
+            [geoforms.db :refer [snippet] :as db]
+            [geoforms.firebase :as fb])
+  (:import goog.History))
 
 ;; -------------------------
 ;; Views
@@ -50,5 +51,5 @@
 
 (defn init! []
   (hook-browser-navigation!)
-  (db/init-session)
+  (fb/init-session)
   (mount-root))
