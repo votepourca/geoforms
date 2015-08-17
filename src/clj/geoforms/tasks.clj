@@ -53,7 +53,7 @@
            (map #(zipmap headers %))
            ;; idea?
            (map #(update % :urls split-list))
-           (map #(update % :supporters (comp ->set-map split-list)))
+           (map #(update % :supporters (comp fb/->set-map split-list)))
            (map #(update % :districts split-list))
            ;; user?
            (map #(update % :age parse-age))
