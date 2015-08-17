@@ -46,11 +46,13 @@
 
   :minify-assets
   {:assets
-    {"resources/public/css/site.min.css" "resources/public/css/site.css"}}
+   {"resources/public/css/site.min.css" "resources/public/css/site.css"}}
 
   :cljsbuild {:builds {:app {:source-paths ["src/cljs"]
                              :compiler {:output-to     "resources/public/js/app.js"
                                         :output-dir    "resources/public/js/out"
+                                        :closure-defines
+                                        {"geoforms.config.fb_base" ~(System/getenv "FB_BASE")}
                                         :asset-path   "js/out"
                                         :optimizations :none
                                         :pretty-print  true}}}}
@@ -85,6 +87,8 @@
                                                          :source-map true}}
                                         :test {:source-paths ["src/cljs"  "test/cljs"]
                                                :compiler {:output-to "target/test.js"
+                                                          :closure-defines
+                                                          {"geoforms.config.fb_path" "testing"}
                                                           :optimizations :whitespace
                                                           :pretty-print true}}}
                                :test-commands {"unit" ["phantomjs" :runner
@@ -92,17 +96,19 @@
                                                        "test/vendor/es5-sham.js"
                                                        "test/vendor/console-polyfill.js"
                                                        "target/test.js"]}}}
+             :prod {:cljsbuild {:builds {:app
+                                         {:source-paths ["env/prod/cljs"]
+                                          :compiler
+                                          {:optimizations :advanced
+                                           :closure-defines
+                                           {"geoforms.config.fb_path" "production"}
+                                           :output-to     "resources/public/js/app_prod.js"
+                                           :output-dir    "resources/public/js/out_prod"
+                                           :asset-path   "js/out_prod"
+                                           :pretty-print false}}}}}
 
              :uberjar {:hooks [leiningen.cljsbuild minify-assets.plugin/hooks]
                        :env {:production true}
                        :aot :all
                        :omit-source true
-                       :cljsbuild {;; :jar true
-                                   :builds {:app
-                                             {:source-paths ["env/prod/cljs"]
-                                              :compiler
-                                              {:optimizations :advanced
-                                               :output-to     "resources/public/js/app_prod.js"
-                                               :output-dir    "resources/public/js/out_prod"
-                                               :asset-path   "js/out_prod"
-                                               :pretty-print false}}}}}})
+                       :cljsbuild {:jar true}}})

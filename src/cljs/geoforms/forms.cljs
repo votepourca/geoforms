@@ -2,6 +2,7 @@
   (:require [reagent.core :as reagent :refer [atom]]
             [reagent-forms.core :refer [bind-fields init-field value-of]]
             [geoforms.db :as db :refer [snippet]]
+            [geoforms.firebase :as fb]
             [geoforms.utils :refer [dequeue-in! valid-email? valid-zip-code?]]))
 
 ;;; state and logic
@@ -39,6 +40,7 @@
 (defn complete! []
   (reset! user-form user-defaults)
   (reset! idea-form idea-defaults)
+  (reset! db/supported-ideas #{})
   (swap! app-state assoc
          :completed? true
          :selected-districts '()))
@@ -63,7 +65,7 @@
 
 (defn submit-idea!
   [doc]
-  (db/create-idea! doc))
+  (fb/create-idea! doc))
 
 (defn queue-idea! [idea]
   (swap! app-state update :pending-ideas #(conj % idea)))
@@ -79,8 +81,7 @@
   (loop []
     (when-let [idea (dequeue-in! app-state [:pending-ideas])]
       (let [idea-id (submit-idea! idea)]
-        (prn idea-id)
-        (db/set-user-idea user-email idea-id true))
+        (fb/set-user-idea user-email idea-id true))
       (recur))))
 
 (defn district-ideas [district]
@@ -156,7 +157,7 @@
 (defn submit!
   "Ensure the signing user exists and their support is noted."
   [doc]
-  (db/create-user! (:person doc) @db/supported-ideas)
+  (fb/create-user-ideas! (:person doc) @db/supported-ideas)
   (submit-ideas! (get-in doc [:person :email]))
   (complete!))
 

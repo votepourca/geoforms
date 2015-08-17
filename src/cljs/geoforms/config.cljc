@@ -1,3 +1,9 @@
 (ns geoforms.config)
 
-(def fb-uri "https://geoforms.firebaseio.com/community-app")
+(#?(:cljs goog-define, :clj def)
+   fb-base "https://matchbox-forms.firebaseio.com/")
+
+(#?(:cljs goog-define, :clj def)
+   fb-path "development")
+
+(def fb-uri (str fb-base fb-path))

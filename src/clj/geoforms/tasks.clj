@@ -3,46 +3,9 @@
   (:require [matchbox.core :as m]
             [clojure.string :as str]
             [clojure.data.csv :as csv]
-            [clojure.java.io :refer [reader]])
+            [clojure.java.io :refer [reader]]
+            [geoforms.firebase :as fb])
   (:gen-class))
-
-;; "db.cljc"
-
-(def mungings
-  {"." "__dot__"
-   "#" "__hash__"
-   "$" "__dollar__"
-   "/" "__slash__"
-   "[" "__lbrace__"
-   "]" "__rbrace__"})
-
-(defn munge- [s]
-  (if-not (string? s)
-    s
-    (reduce (fn [s [in out]] (str/replace s in out))
-            s
-            mungings)))
-
-(defn ->set-map
-  "Convert a set into a map of {element true}"
-  [set]
-  (zipmap (map munge- set) (repeat true)))
-
-(def ref (m/connect "https://geoforms.firebaseio.com/community-app"))
-
-;; upsert
-(defn create-user! [{:keys [email] :as user} cb]
-  (let [path [:users (munge- email)]]
-    (m/swap-in! ref path
-                (fn [{:keys [created-at] :as existing}]
-                  (assoc user :created-at (or created-at m/SERVER_TIMESTAMP)))
-                :callback cb)))
-
-;; NOT AN UPSERT
-(defn create-idea! [idea cb]
-  (m/conj-in! ref [:ideas] idea cb))
-
-;;
 
 (defn update [m k f]
   (if-not (get m k)
@@ -104,8 +67,8 @@
 
 (defn load-fn [type]
   (case type
-    ":users" create-user!
-    ":ideas" create-idea!))
+    ":users" fb/create-user!
+    ":ideas" fb/create-idea!))
 
 (defn -main [type filepath]
   (println (str "Loading " type " from " filepath))
