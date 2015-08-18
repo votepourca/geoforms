@@ -51,8 +51,6 @@
   :cljsbuild {:builds {:app {:source-paths ["src/cljs"]
                              :compiler {:output-to     "resources/public/js/app.js"
                                         :output-dir    "resources/public/js/out"
-                                        :closure-defines
-                                        {"geoforms.config.fb_base" ~(System/getenv "FB_BASE")}
                                         :asset-path   "js/out"
                                         :optimizations :none
                                         :pretty-print  true}}}}
