@@ -24,6 +24,12 @@ To run the Figwheel development server, run:
 lein do clean, run
 ```
 
+or
+
+```
+FB_BASE="https://<your-app>.firebaseio.com/" lein do clean, run
+```
+
 The application will now be available at [http://localhost:3000](http://localhost:3000).
 
 To start the Figwheel compiler, run the following command in a separate terminal:
@@ -31,6 +37,13 @@ To start the Figwheel compiler, run the following command in a separate terminal
 ```
 lein figwheel
 ```
+
+or
+
+```
+FB_BASE="https://<your-app>.firebaseio.com/" lein figwheel
+```
+
 Figwheel will automatically push cljs changes to the browser.
 
 If you're only doing client-side development then it's sufficient to simply run the
