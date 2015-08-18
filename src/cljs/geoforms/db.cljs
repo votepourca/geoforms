@@ -74,7 +74,6 @@
          "Saint-Sauveur"
          "Sainte-Foy"
          "Sillery"
-         "Stoneham"
          "Val-Bélair"
          "Vanier"
          "Vieux-Limoilou"
