@@ -31,12 +31,14 @@
 (def email-regex #"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$")
 
 (def canadian-postal-code-regex
+  ;; Regex that matches Canadian Postal-Code formats with or without space
+  ;; (e.g., T2X 1V4 or T2X1V4).
   #"^[ABCEGHJKLMNPRSTVXY]{1}\d{1}[A-Z]{1} *\d{1}[A-Z]{1}\d{1}$")
-#_"Matches Canadian Postal-Code formats with or without space (e.g., T2X 1V4 or T2X1V4)."
 
 (def us-postal-code-regex
+  ;; Regex that matches all US format zip code formats
+  ;; (e.g., 94105-0011 or 94105)
   #"^\d{5}(-\d{4})?$")
-#_"Matches all US format zip code formats (e.g., 94105-0011 or 94105)"
 
 (def us-and-canadian-postal-code-regex
   #"(^\d{5}(-\d{4})?$)|(^[ABCEGHJKLMNPRSTVXY]{1}\d{1}[A-Z]{1} *\d{1}[A-Z]{1}\d{1}$)")
