@@ -19,17 +19,9 @@ It also has a clojure backend for now (but might be removed) and Heroku faciliti
 ### Development mode
 
 ```
-lein do clean, run
-```
-or
-```
 FB_BASE="https://<your-app>.firebaseio.com/" lein do clean, run
 ```
 Then
-```
-lein figwheel
-```
-or
 ```
 FB_BASE="https://<your-app>.firebaseio.com/" lein figwheel
 ```
@@ -39,10 +31,6 @@ The application will now be available at [http://localhost:3000](http://localhos
 
 ### Static deployment (to javascript)
 
-```
-lein with-profile prod cljsbuild once
-```
-or
 ```
 FB_BASE="https://<your-app>.firebaseio.com/" lein with-profile prod cljsbuild once
 ```
@@ -57,6 +45,3 @@ Many thanks to Chris Truter (crisptrutski) for his contribution.
 Copyright © 2015 Votepour.ca and Leon Talbot
 
 Distributed under the The MIT License (MIT).
-
-
-
